@@ -1,7 +1,0 @@
-.next
-coverage
-node_modules
-package-lock.json
-public/assets/antarctica-logo.svg
-data/prices.json
-data/benchmark.json

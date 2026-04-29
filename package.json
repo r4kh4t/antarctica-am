@@ -7,17 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
     "precommit": "lint-staged && npm run lint && npm test",
     "prepare": "husky",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,mjs,json,md,css}": "prettier --write"
+    "*.{ts,tsx,js,jsx,mjs,json,css}": "biome format --write"
   },
   "dependencies": {
+    "@instructor-ai/instructor": "^1.7.0",
     "langfuse": "^3.38.20",
     "next": "^16.2.4",
     "openai": "^6.35.0",
@@ -26,6 +27,7 @@
     "recharts": "^3.8.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.13",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^20.19.39",
     "@types/react": "^19.2.14",
@@ -34,7 +36,6 @@
     "eslint-config-next": "^16.2.4",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
-    "prettier": "^3.8.3",
     "tailwindcss": "^4.2.4",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
