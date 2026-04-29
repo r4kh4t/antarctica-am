@@ -7,7 +7,7 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 ---
 
-## [Unreleased]
+## [0.7.0] — 2026-04-30
 
 ### Added
 - `.cursor/rules/tailwind.mdc` — Tailwind v4 token convention rule; documents `@theme` usage, full token reference table, and when `(--*)` is still appropriate.
@@ -23,7 +23,9 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 ---
 
-### Added (previous unreleased)
+## [0.6.0] — 2026-04-30
+
+### Added
 - **Rollbar error tracking** (`rollbar`, `@rollbar/react`) — client-side via `<RollbarProvider>`, root-layout via `global-error.tsx`, server-side via `captureServerError()` in the API route. No-op when tokens are absent.
 - **Vercel Web Analytics** (`@vercel/analytics`) — privacy-first page views and visitor stats, 50 k events/month free.
 - **Vercel Speed Insights** (`@vercel/speed-insights`) — Core Web Vitals per real visitor, 10 k data points/month free.

@@ -77,9 +77,15 @@ describe("RationaleResponseSchema", () => {
 
   it("infers the correct TypeScript type", () => {
     const result = RationaleResponseSchema.parse(VALID_RESPONSE);
-    // Type assertions at compile time — the assignments below will error if types are wrong
-    expect(typeof result.narrative satisfies "string").toBe("string");
-    expect(typeof result.rationale satisfies "object").toBe("object");
-    expect(typeof result.sectorInsights satisfies "object").toBe("object");
+    // Compile-time assertions: satisfies checks the TS type of the value, not
+    // the runtime typeof string. These lines error at build time if the schema
+    // type diverges from the expected shape.
+    void (result.narrative satisfies string);
+    void (result.rationale satisfies Record<string, string>);
+    void (result.sectorInsights satisfies Record<string, string>);
+    // Runtime shape checks
+    expect(typeof result.narrative).toBe("string");
+    expect(typeof result.rationale).toBe("object");
+    expect(typeof result.sectorInsights).toBe("object");
   });
 });

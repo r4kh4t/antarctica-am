@@ -121,10 +121,12 @@ describe("normalizeRationaleResponse", () => {
   });
 
   it("returns empty sectorInsights when not provided", () => {
-    const noInsights: RationaleResponseShape = {
+    // Cast needed: Zod's .default({}) makes the inferred type non-optional,
+    // but we still test the defensive normalisation path.
+    const noInsights = {
       ...fullResponse,
       sectorInsights: undefined,
-    };
+    } as unknown as RationaleResponseShape;
     const result = normalizeRationaleResponse(noInsights, rows);
     expect(result.sectorInsights).toEqual({});
   });
