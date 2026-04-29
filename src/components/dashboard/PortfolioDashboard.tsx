@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { formatPercent } from "@/lib/portfolio/format";
 import type { PortfolioRecommendation } from "@/lib/portfolio/types";
+import { AI_STATUS, API_ROUTES } from "@/lib/constants";
+import type { AiState } from "@/lib/constants";
 import { MethodologyCard } from "./MethodologyCard";
 import { RecommendationTable } from "@/components/table";
 import { WeightChart } from "@/components/chart";
@@ -11,16 +13,6 @@ import { WeightChart } from "@/components/chart";
 type PortfolioDashboardProps = {
   recommendation: PortfolioRecommendation;
 };
-
-export type AiState =
-  | { status: "loading" }
-  | {
-      status: "loaded";
-      rationale: Record<string, string>;
-      narrative: string;
-      sectorInsights: Record<string, string>;
-    }
-  | { status: "error" };
 
 function KpiCard({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
@@ -33,12 +25,12 @@ function KpiCard({ label, value, detail }: { label: string; value: string; detai
 }
 
 export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) {
-  const [aiState, setAiState] = useState<AiState>({ status: "loading" });
+  const [aiState, setAiState] = useState<AiState>({ status: AI_STATUS.LOADING });
 
   useEffect(() => {
     async function fetchAi() {
       try {
-        const res = await fetch("/api/rationale", {
+        const res = await fetch(API_ROUTES.RATIONALE, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -73,14 +65,14 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
 
         const data = await res.json();
         setAiState({
-          status: "loaded",
+          status: AI_STATUS.LOADED,
           rationale: data.rationale ?? {},
           narrative: data.narrative ?? "",
           sectorInsights: data.sectorInsights ?? {},
         });
       } catch (err) {
         console.error("[PortfolioDashboard] AI fetch failed:", err);
-        setAiState({ status: "error" });
+        setAiState({ status: AI_STATUS.ERROR });
       }
     }
 

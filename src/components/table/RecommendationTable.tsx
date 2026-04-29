@@ -3,7 +3,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { formatPercent, formatScore, formatSignedPercent } from "@/lib/portfolio/format";
 import type { PortfolioRecommendation, RecommendationRow } from "@/lib/portfolio/types";
-import type { AiState } from "@/components/dashboard/PortfolioDashboard";
+import { AI_STATUS } from "@/lib/constants";
+import type { AiState } from "@/lib/constants";
 import { TextLineSkeleton } from "@/components/shared/Skeleton";
 import { Tooltip, InfoIcon } from "@/components/shared/Tooltip";
 import { InlineMarkdown } from "@/components/shared/InlineMarkdown";
@@ -48,10 +49,10 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
   const [sortKey, setSortKey] = useState<SortKey>("recommendedWeight");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  const isLoadingAi = aiState.status === "loading";
+  const isLoadingAi = aiState.status === AI_STATUS.LOADING;
 
   function getRationale(row: RecommendationRow): RationaleResult {
-    if (aiState.status === "loaded") {
+    if (aiState.status === AI_STATUS.LOADED) {
       const aiText = aiState.rationale[row.assetId];
       if (aiText && aiText.trim().length > 0) {
         return { text: aiText, source: "ai" };
@@ -125,14 +126,14 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
               AI analysis in progress
             </div>
           )}
-          {aiState.status === "loaded" && (
+          {aiState.status === AI_STATUS.LOADED && (
             <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
               AI-enhanced
             </span>
           )}
         </div>
 
-        {aiState.status === "loaded" && aiState.narrative && (
+        {aiState.status === AI_STATUS.LOADED && aiState.narrative && (
           <p className="mt-4 max-w-3xl text-sm leading-6 text-secondary/80 italic">
             <InlineMarkdown text={aiState.narrative} />
           </p>

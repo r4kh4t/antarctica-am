@@ -1,6 +1,7 @@
 import { formatPercent } from "@/lib/portfolio/format";
 import type { PortfolioRecommendation } from "@/lib/portfolio/types";
-import type { AiState } from "./PortfolioDashboard";
+import { AI_STATUS } from "@/lib/constants";
+import type { AiState } from "@/lib/constants";
 import { Tooltip, InfoIcon } from "@/components/shared/Tooltip";
 
 type MethodologyCardProps = {
@@ -9,7 +10,7 @@ type MethodologyCardProps = {
 };
 
 export function MethodologyCard({ recommendation, aiState }: MethodologyCardProps) {
-  const sectorInsights = aiState.status === "loaded" ? aiState.sectorInsights : {};
+  const sectorInsights = aiState.status === AI_STATUS.LOADED ? aiState.sectorInsights : {};
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -30,7 +31,7 @@ export function MethodologyCard({ recommendation, aiState }: MethodologyCardProp
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-secondary">
             Soft constraints
           </p>
-          {aiState.status === "loading" && (
+          {aiState.status === AI_STATUS.LOADING && (
             <span className="h-1.5 w-1.5 animate-ping rounded-full bg-primary" />
           )}
         </div>
