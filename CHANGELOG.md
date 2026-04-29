@@ -5,109 +5,114 @@ All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).  
 Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/).
 
+Versioning rule: bump `package.json` **and** add a changelog entry in the same commit.
+
+---
+
+## [0.8.0] — 2026-04-30
+
+### Added
+- `src/lib/constants.ts`: centralise `AI_STATUS` const object, `AiState` discriminated union (moved from `PortfolioDashboard`), and `API_ROUTES`. Eliminates magic strings across 3 components.
+- `.cursor/rules/changelog.mdc`: AI rule enforcing changelog + `package.json` version update on every meaningful commit.
+- `.cursor/hooks/post-edit-reminder.mjs`: extended to remind about `CHANGELOG.md` after any `src/` file edit.
+- `.cursor/subagents/changelog-updater.md`: autonomous subagent for retroactive changelog updates and version promotion.
+
+### Changed
+- `WeightChart`: removed `next/dynamic` wrapper — both `WeightChart` and `WeightChartContent` are `"use client"`, making `ssr: false` a no-op. Regular import eliminates the module-resolution false positive and the `IntrinsicAttributes` mismatch.
+- `WeightChartContent`: removed default export added as a `dynamic()` workaround; back to a single named export.
+
+### Fixed
+- `guardrails.test.ts`: cast `sectorInsights: undefined` test fixture to bypass Zod's `.default({})` inferred non-optional type.
+- `schemas.test.ts`: replace `typeof x satisfies "literal"` (always errors — `typeof` value has union type) with `void (x satisfies Type)` for compile-time check + separate `expect(typeof x).toBe(...)` for runtime check.
+- `.cursor/rules/tailwind.mdc`: add "no arbitrary rem/em" rule; document built-in scale equivalents and `@theme` token pattern.
+- `globals.css @theme`: add `--tracking-label-sm`, `--tracking-label`, `--tracking-label-lg` tokens; replace all `tracking-[Xem]` arbitrary values across 5 components.
+
 ---
 
 ## [0.7.0] — 2026-04-30
 
 ### Added
-- `.cursor/rules/tailwind.mdc` — Tailwind v4 token convention rule; documents `@theme` usage, full token reference table, and when `(--*)` is still appropriate.
-- `globals.css @theme`: add named letter-spacing tokens (`--tracking-label-sm`, `--tracking-label`, `--tracking-label-lg`) so tracking values live in CSS, not in JSX strings.
+- `.cursor/rules/tailwind.mdc`: Tailwind v4 CSS variable shorthand rule; documents `@theme` usage and token reference table.
+- `globals.css @theme`: named letter-spacing tokens (`--tracking-label-sm`, `--tracking-label`, `--tracking-label-lg`).
 
 ### Changed
-- `PortfolioDashboard`: replace `rounded-[2rem]` with `rounded-4xl`; replace all `tracking-[0.2em]`/`tracking-[0.24em]` with named tokens.
-- `MethodologyCard`, `RecommendationTable`, `WeightChart`, `TableControls`: replace all `tracking-[Xem]` arbitrary values with `tracking-label`, `tracking-label-sm`, `tracking-label-lg`.
-- `tailwind.mdc`: add "no arbitrary rem/em" rule with full token reference tables for colours and letter-spacing.
-
-### Changed
-- **Design token refactor** — `globals.css` `:root` variables replaced with a Tailwind v4 `@theme` block; brand tokens renamed from `--antarctica-*` to semantic names (`--color-ink`, `--color-primary`, `--color-primary-subtle`, `--color-primary-muted`, `--color-secondary`, `--color-surface`, `--color-border`). All 8 component files updated to use plain utility classes (`bg-ink`, `text-primary`, `ring-border`, etc.) — no more `(--*)` wrappers for brand colours. Zero functional or visual change.
+- `globals.css`: migrate brand colour tokens from `:root` (`--antarctica-*`) to Tailwind v4 `@theme` semantic names (`--color-ink`, `--color-primary`, `--color-primary-subtle`, `--color-primary-muted`, `--color-secondary`, `--color-surface`, `--color-border`). All 8 component files updated to plain utility classes (`bg-ink`, `text-primary`, `ring-border`, etc.).
+- All components: migrate `[var(--*)]` arbitrary CSS variable syntax to Tailwind v4 `(--*)` shorthand.
+- `PortfolioDashboard`: `rounded-[2rem]` → `rounded-4xl`.
+- `biome.json`: enable `css.parser.tailwindDirectives` so Biome accepts `@theme` blocks.
 
 ---
 
 ## [0.6.0] — 2026-04-30
 
 ### Added
-- **Rollbar error tracking** (`rollbar`, `@rollbar/react`) — client-side via `<RollbarProvider>`, root-layout via `global-error.tsx`, server-side via `captureServerError()` in the API route. No-op when tokens are absent.
-- **Vercel Web Analytics** (`@vercel/analytics`) — privacy-first page views and visitor stats, 50 k events/month free.
-- **Vercel Speed Insights** (`@vercel/speed-insights`) — Core Web Vitals per real visitor, 10 k data points/month free.
-- **GitHub Actions CI** (`.github/workflows/ci.yml`) — format check → lint → test → build on every push/PR to `main`, `develop`, `staging`. Fails on PRs that skip `CHANGELOG.md`.
-- **Commit message hook** (`.husky/commit-msg`) — enforces Conventional Commits format on every commit.
-- **Branch naming hook** (`.husky/pre-push`) — enforces `<type>/<description>` branch names before every push.
-- **Cursor subagents** (`.cursor/subagents/`) — `ci-runner`, `dependency-updater`, `pre-release-checker`, `test-writer` autonomous agents.
-- **Cursor skills** — `deploy`, `testing`, `debug`, `langfuse` reference guides.
-- `CHANGELOG.md` — this file; changelog enforcement added to CI.
+- **Rollbar error tracking** (`rollbar`, `@rollbar/react`) — client via `<RollbarProvider>`, root-layout via `global-error.tsx`, server via `captureServerError()` in API route. No-op when tokens absent.
+- **Vercel Web Analytics** (`@vercel/analytics`) — 50 k events/month free.
+- **Vercel Speed Insights** (`@vercel/speed-insights`) — Core Web Vitals, 10 k data points/month free.
+- **GitHub Actions CI** (`.github/workflows/ci.yml`) — format → lint → test → build; changelog presence check on PRs to `main`/`develop`.
+- **Commit message hook** (`.husky/commit-msg`) — enforces Conventional Commits format.
+- **Branch naming hook** (`.husky/pre-push`) — enforces `<type>/<description>` branch names.
+- **Cursor subagents** — `ci-runner`, `dependency-updater`, `pre-release-checker`, `test-writer`.
+- **Cursor skills** — `deploy`, `testing`, `debug`, `langfuse`.
+- `CHANGELOG.md` introduced; changelog enforcement in CI.
 
 ### Changed
-- **Langfuse tracing replaced** — removed manual `traceLLMCall()` / `Langfuse` client; replaced with `observeOpenAI` framework integration (`@langfuse/openai` + `@langfuse/otel` + `@opentelemetry/sdk-trace-node`). Automatic token, cost, latency, and error tracking. Serverless-safe `forceFlush()` via Next.js `after()`.
-- `src/instrumentation.ts` — new Next.js startup hook registering `NodeTracerProvider` + `LangfuseSpanProcessor`.
-- `src/lib/llm/observability.ts` — replaces `langfuse.ts`; exports `getTracedOpenAIClient()` singleton.
-- `src/lib/llm/instructor.ts` — now wraps the Langfuse-traced client so all Instructor completions are automatically traced.
-- `next.config.ts` — added `serverExternalPackages` to prevent Turbopack bundling OTel + Rollbar for the browser.
-- `docs/development-workflow.md` — updated: Biome replaces Prettier reference, new commit/branch conventions, changelog policy, CI steps.
-- `docs/ai-workflow.md` — updated: new skills, subagents, LLM feature list.
-- `docs/architecture.md` — updated: component groups, LLM utilities table, full observability stack, OTel setup.
+- **Langfuse tracing** — replaced manual `traceLLMCall()` with `observeOpenAI` (`@langfuse/openai` + `@langfuse/otel` + `@opentelemetry/sdk-trace-node`).
+- `src/instrumentation.ts` — Next.js startup hook registering `NodeTracerProvider` + `LangfuseSpanProcessor`.
+- `src/lib/llm/observability.ts` — `getTracedOpenAIClient()` singleton using `observeOpenAI`.
+- `src/lib/llm/instructor.ts` — wraps the traced client; all completions automatically traced.
+- `next.config.ts` — `serverExternalPackages` for OTel + Rollbar.
+- All three `docs/` files updated to reflect current stack.
 
 ### Removed
-- `src/lib/llm/langfuse.ts` — replaced by `observability.ts` + OpenTelemetry integration.
+- `src/lib/llm/langfuse.ts` — replaced by `observability.ts` + OpenTelemetry.
 
 ---
 
 ## [0.5.0] — 2026-04-29
 
 ### Added
-- **Biome formatter** (`@biomejs/biome`) replacing Prettier. `npm run format` and `npm run format:check` updated. `lint-staged` updated to use `biome format --write`.
-- **Instructor JS + Zod structured outputs** (`@instructor-ai/instructor`, `zod`) — `schemas.ts` defines `RationaleResponseSchema`; API route uses Instructor for GPT-4o with `max_retries: 2`; o-series falls back to direct call + manual `RationaleResponseSchema.parse()`.
-- **38 unit tests** across 4 new test files: `tokens.test.ts`, `guardrails.test.ts`, `formatters.test.ts`, `schemas.test.ts`.
+- **Biome formatter** replacing Prettier — `npm run format`, `npm run format:check`, `lint-staged` updated.
+- **Instructor JS + Zod** (`@instructor-ai/instructor`, `zod`) — `RationaleResponseSchema`, auto-retry, structured outputs.
+- **38 unit tests** — `tokens.test.ts`, `guardrails.test.ts`, `formatters.test.ts`, `schemas.test.ts`.
 
 ### Removed
-- `.prettierrc`, `.prettierignore` — replaced by Biome.
+- `.prettierrc`, `.prettierignore`.
 
 ---
 
 ## [0.4.0] — 2026-04-28
 
 ### Added
-- **AI rationale generation** — `POST /api/rationale` calls GPT-4o with portfolio data formatted as markdown tables. Loading skeleton in rationale column.
+- **AI rationale generation** — `POST /api/rationale` calls GPT-4o; portfolio data formatted as markdown tables.
 - **Pill-based filters** and **column sorting** in `RecommendationTable`.
-- **Component grouping** — components reorganised into `dashboard/`, `table/`, `chart/`, `shared/` subdirectories.
-- **Langfuse observability** (initial manual implementation via `langfuse.ts`).
+- **Component grouping** — `dashboard/`, `table/`, `chart/`, `shared/` subdirectories.
 - **LLM utilities** — `client.ts`, `tokens.ts`, `guardrails.ts`, `formatters.ts`, `prompts/rationale.ts`.
-- **Cursor rule** `llm-integration.mdc` — prompt versioning, guardrails, token management, reasoning-model handling.
-- `docs/llm-integration.md` — LLM integration documentation.
+- Cursor rule `llm-integration.mdc`. `docs/llm-integration.md`.
 
 ### Fixed
-- `assetId` key mapping — `formatters.ts` now includes `Asset ID` column; prompt updated to use exact asset ID as JSON key.
-- Sector insight tooltips added to `MethodologyCard`.
-- Algorithmic-rationale fallback shows info icon + tooltip instead of generic text.
-- Backtick-wrapped text in rationale rendered as bold via `InlineMarkdown` component.
+- `assetId` key mapping, sector insight tooltips, algo-rationale icon + tooltip, bold backtick rendering via `InlineMarkdown`.
 
 ---
 
 ## [0.3.0] — 2026-04-27
 
 ### Added
-- Antarctica brand: Gotham font stack, brand colour palette via CSS variables, SVG favicon.
-- Responsive `RecommendationTable` with horizontal scroll on small screens.
-- `cursor-pointer` on sortable column headers.
-- Pre-commit hooks (Husky + lint-staged) running format, lint, and tests.
-- `docs/` folder: `architecture.md`, `recommendation-methodology.md`, `development-workflow.md`, `ai-workflow.md`, `brand-notes.md`.
+- Antarctica brand: Gotham font stack, brand colour palette, SVG favicon.
+- Responsive `RecommendationTable` with horizontal scroll.
+- Pre-commit hooks (Husky + lint-staged).
+- `docs/` folder with architecture, methodology, workflow, brand notes.
 
 ---
 
 ## [0.2.0] — 2026-04-26
 
 ### Added
-- Vercel deployment under `own-x-startup` scope.
-- GitHub private repository with HTTPS remote.
-- `AGENTS.md` — repository-level AI guidance.
+- Vercel deployment. GitHub private repository. `AGENTS.md`.
 
 ---
 
 ## [0.1.0] — 2026-04-26
 
 ### Added
-- Next.js 16 project scaffold (App Router, TypeScript, Tailwind CSS).
-- Generated fixture data: `data/holdings.json`, `data/prices.json`, `data/benchmark.json`, `data/constraints.json`.
-- Portfolio calculation pipeline: daily prices → month-end returns → risk-adjusted scoring → soft constraint enforcement.
-- Dashboard UI: KPI cards, `RecommendationTable`, `WeightChart`, `MethodologyCard`.
-- 5 portfolio unit tests (`recommendation.test.ts`).
-- Cursor rules, hooks, and skills for AI-assisted development.
+- Next.js scaffold, fixture data, portfolio calculation pipeline, dashboard UI, 5 unit tests, Cursor rules/hooks/skills.

@@ -55,9 +55,30 @@ Use these headings (only include the ones you need):
 Keep each entry to **one line**. Start with the file, module, or feature area as a
 backtick label when it makes the entry clearer.
 
+## package.json Version
+
+Every time you add a changelog entry, also bump the `version` field in
+`package.json` to match the current changelog section:
+
+```json
+{ "version": "0.9.0" }
+```
+
+Use semantic versioning:
+- **patch** (0.8.x) — bug fixes, style/refactor with no new behaviour
+- **minor** (0.x.0) — new features, new utilities, notable refactors
+- **major** (x.0.0) — breaking changes to the public API or data shape
+
+## Pre-commit Hook
+
+`.husky/pre-commit` now **blocks commits** when `src/`, `docs/`, `data/`, or
+`.cursor/` files are staged but `CHANGELOG.md` is not. Use `--no-verify` only
+for lockfile-only or CI-config-only commits.
+
 ## Checklist Before Committing
 
 1. Code change is complete and tests pass.
-2. CHANGELOG.md has an entry under `## [Unreleased]`.
-3. The entry accurately describes the change (not just copies the commit message).
-4. Both the code files and CHANGELOG.md are included in the same commit.
+2. `CHANGELOG.md` has an entry under the current version section.
+3. `package.json` `"version"` matches the CHANGELOG section.
+4. The entry accurately describes the change (not just copies the commit message).
+5. Code files, `CHANGELOG.md`, and `package.json` are all in the same commit.

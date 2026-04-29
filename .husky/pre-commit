@@ -1,1 +1,32 @@
+#!/bin/sh
+
+# ── Changelog gate ────────────────────────────────────────────────────────────
+# Every commit must stage CHANGELOG.md unless bypassed with --no-verify.
+# Exception: commits that only touch files outside src/, docs/, data/, .cursor/
+# (e.g. lockfile-only or CI config tweaks) may use --no-verify.
+
+STAGED=$(git diff --cached --name-only)
+
+NEEDS_CHANGELOG=$(echo "$STAGED" | grep -E "^(src|docs|data|\.cursor)/" | head -1)
+
+if [ -n "$NEEDS_CHANGELOG" ]; then
+  if ! echo "$STAGED" | grep -q "^CHANGELOG.md$"; then
+    echo ""
+    echo "✗ Pre-commit blocked: CHANGELOG.md is not staged."
+    echo ""
+    echo "  You changed files under src/, docs/, data/, or .cursor/ but did not"
+    echo "  update CHANGELOG.md. Add an entry under the current version and stage it:"
+    echo ""
+    echo "    git add CHANGELOG.md"
+    echo ""
+    echo "  Also ensure package.json version matches the latest CHANGELOG section."
+    echo ""
+    echo "  To bypass (lockfile bumps, CI-only changes, etc.):"
+    echo "    git commit --no-verify"
+    echo ""
+    exit 1
+  fi
+fi
+
+# ── Quality checks ─────────────────────────────────────────────────────────────
 npm run precommit
