@@ -6,46 +6,73 @@ alwaysApply: true
 
 # Tailwind CSS v4 Conventions
 
-## CSS Variable Shorthand
+## Design Tokens via `@theme`
 
-Tailwind v4 introduced a shorter syntax for referencing CSS custom properties.
-Always use the shorthand form — never the legacy `[var(...)]` form:
+Brand colours are declared in `src/app/globals.css` inside a `@theme` block.
+This registers them as native Tailwind utilities — no `(--*)` wrapper needed.
 
+```css
+/* globals.css */
+@theme {
+  --color-ink: #050505;
+  --color-primary: #b7d5eb;
+  --color-primary-subtle: #eef7fc;
+  --color-primary-muted: #d8eaf6;
+  --color-secondary: #1f2528;
+  --color-surface: #f5f3ef;
+  --color-border: #d8d8d2;
+}
 ```
-# Wrong (Tailwind v3 style)
-bg-[var(--antarctica-ink)]
-text-[var(--antarctica-charcoal)]/40
 
-# Correct (Tailwind v4 style)
-bg-(--antarctica-ink)
-text-(--antarctica-charcoal)/40
-```
+## Using Tokens in Components
 
-The pattern applies to **any** utility prefix: `bg-`, `text-`, `ring-`, `border-`,
-`fill-`, `stroke-`, `shadow-`, `from-`, `via-`, `to-`, `accent-`, `caret-`, etc.
-
-## Arbitrary Values vs Shorthand
-
-| Scenario | Use |
-|---|---|
-| CSS variable | `bg-(--my-var)` |
-| Arbitrary fixed value | `bg-[#1a2b3c]` or `bg-[24px]` |
-| Arbitrary value with opacity | `bg-(--my-var)/50` |
-
-## Responsive and State Variants
-
-Variants compose normally with the shorthand:
+Because they are `@theme` tokens, use them like any built-in Tailwind colour:
 
 ```tsx
-className="hover:text-(--antarctica-ice) lg:bg-(--antarctica-ink)"
+// Correct — plain utility name
+<div className="bg-ink text-primary ring-1 ring-border" />
+<p className="text-secondary/65" />
+<span className="bg-primary-subtle hover:bg-primary-muted" />
+
+// Wrong — do not use (--*) for @theme colours
+<div className="bg-(--color-ink)" />          // ✗
+<div className="bg-[var(--color-ink)]" />     // ✗
 ```
 
-## Project CSS Variables
+## Token Reference
 
-All brand tokens are defined in `src/app/globals.css` under `:root`:
+| Utility class | CSS variable | Hex | Role |
+|---|---|---|---|
+| `ink` | `--color-ink` | `#050505` | Near-black — headings, dark surfaces |
+| `primary` | `--color-primary` | `#b7d5eb` | Brand accent blue |
+| `primary-subtle` | `--color-primary-subtle` | `#eef7fc` | Light primary background |
+| `primary-muted` | `--color-primary-muted` | `#d8eaf6` | Primary hover state |
+| `secondary` | `--color-secondary` | `#1f2528` | Body text, labels |
+| `surface` | `--color-surface` | `#f5f3ef` | Page and card backgrounds |
+| `border` | `--color-border` | `#d8d8d2` | Dividers, rings |
 
-- `--antarctica-ink` — primary dark navy
-- `--antarctica-ice` — brand teal/blue
-- `--antarctica-ice-light` — lighter teal for progress track backgrounds
-- `--antarctica-charcoal` — secondary text
-- `--antarctica-line` — subtle border/ring colour
+## Opacity Modifiers
+
+Works the same as built-in colours:
+
+```tsx
+text-secondary/65      // 65% opacity
+ring-primary/30        // 30% opacity ring
+bg-primary/12          // 12% opacity background
+```
+
+## When `(--*)` Is Still Correct
+
+Only use `(--*)` for CSS variables that are **not** in `@theme` — for example,
+one-off values defined in `:root` or inline styles you cannot express as a
+Tailwind utility.
+
+## Arbitrary Values
+
+For fixed non-token values, still use `[]`:
+
+```tsx
+text-[0.65rem]
+tracking-[0.2em]
+grid-cols-[1.1fr_0.9fr]
+```

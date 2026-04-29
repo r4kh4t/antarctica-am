@@ -13,54 +13,50 @@ export function MethodologyCard({ recommendation, aiState }: MethodologyCardProp
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="rounded-3xl bg-(--antarctica-ink) p-6 text-white shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--antarctica-ice)">
-          Methodology
-        </p>
+      <div className="rounded-3xl bg-ink p-6 text-white shadow-sm">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Methodology</p>
         <h2 className="mt-2 text-2xl font-semibold">How the recommendation was produced</h2>
         <ul className="mt-5 space-y-3 text-sm leading-6 text-white/78">
           {recommendation.methodology.map((item) => (
             <li key={item} className="flex gap-3">
-              <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-(--antarctica-ice)" />
+              <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span>{item}</span>
             </li>
           ))}
         </ul>
       </div>
-      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-(--antarctica-line)">
+      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--antarctica-charcoal)">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-secondary">
             Soft constraints
           </p>
           {aiState.status === "loading" && (
-            <span className="h-1.5 w-1.5 animate-ping rounded-full bg-(--antarctica-ice)" />
+            <span className="h-1.5 w-1.5 animate-ping rounded-full bg-primary" />
           )}
         </div>
-        <h2 className="mt-2 text-2xl font-semibold text-(--antarctica-ink)">
-          Sector exposure check
-        </h2>
+        <h2 className="mt-2 text-2xl font-semibold text-ink">Sector exposure check</h2>
         <div className="mt-5 space-y-4">
           {recommendation.sectorExposures.map((sector) => {
             const insight = sectorInsights[sector.sector];
             return (
               <div key={sector.sector}>
                 <div className="flex items-center justify-between gap-4 text-sm">
-                  <span className="flex items-center gap-1.5 font-semibold text-(--antarctica-charcoal)">
+                  <span className="flex items-center gap-1.5 font-semibold text-secondary">
                     {sector.sector}
                     {insight && (
                       <Tooltip content={insight} width="w-64">
-                        <InfoIcon className="text-(--antarctica-charcoal)/40 hover:text-(--antarctica-charcoal)" />
+                        <InfoIcon className="text-secondary/40 hover:text-secondary" />
                       </Tooltip>
                     )}
                   </span>
-                  <span className="text-(--antarctica-charcoal)/65">
+                  <span className="text-secondary/65">
                     {formatPercent(sector.recommendedWeight)} target, range{" "}
                     {formatPercent(sector.min, 0)}-{formatPercent(sector.max, 0)}
                   </span>
                 </div>
-                <div className="mt-2 h-2 rounded-full bg-(--antarctica-ice-light)">
+                <div className="mt-2 h-2 rounded-full bg-primary-subtle">
                   <div
-                    className="h-2 rounded-full bg-(--antarctica-ice)"
+                    className="h-2 rounded-full bg-primary"
                     style={{ width: `${Math.min(sector.recommendedWeight * 100, 100)}%` }}
                   />
                 </div>

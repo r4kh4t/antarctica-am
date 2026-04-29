@@ -10,10 +10,10 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Added
-- `.cursor/rules/tailwind.mdc` — Tailwind v4 CSS variable shorthand rule; enforces `bg-(--var)` over `bg-[var(--var)]` in all `.tsx`/`.ts`/`.css` files.
+- `.cursor/rules/tailwind.mdc` — Tailwind v4 token convention rule; documents `@theme` usage, full token reference table, and when `(--*)` is still appropriate.
 
 ### Changed
-- Migrated all 8 component files from Tailwind v3 `[var(--*)]` syntax to Tailwind v4 `(--*)` shorthand (`MethodologyCard`, `PortfolioDashboard`, `RecommendationTable`, `TableControls`, `WeightChart`, `Tooltip`, `Skeleton`, `InlineMarkdown`).
+- **Design token refactor** — `globals.css` `:root` variables replaced with a Tailwind v4 `@theme` block; brand tokens renamed from `--antarctica-*` to semantic names (`--color-ink`, `--color-primary`, `--color-primary-subtle`, `--color-primary-muted`, `--color-secondary`, `--color-surface`, `--color-border`). All 8 component files updated to use plain utility classes (`bg-ink`, `text-primary`, `ring-border`, etc.) — no more `(--*)` wrappers for brand colours. Zero functional or visual change.
 
 ---
 

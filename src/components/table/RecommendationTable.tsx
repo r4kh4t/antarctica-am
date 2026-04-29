@@ -107,22 +107,20 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
   }
 
   return (
-    <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-(--antarctica-line)">
-      <div className="border-b border-(--antarctica-line) p-6">
+    <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-border">
+      <div className="border-b border-border p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--antarctica-charcoal)">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-secondary">
               Recommendation
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-(--antarctica-ink)">
-              Proposed asset weights
-            </h2>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">Proposed asset weights</h2>
           </div>
           {isLoadingAi && (
-            <div className="flex items-center gap-2 rounded-full bg-(--antarctica-ice-light) px-3 py-1.5 text-xs font-semibold text-(--antarctica-charcoal)">
+            <div className="flex items-center gap-2 rounded-full bg-primary-subtle px-3 py-1.5 text-xs font-semibold text-secondary">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--antarctica-ice) opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-(--antarctica-ice)" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
               AI analysis in progress
             </div>
@@ -135,7 +133,7 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
         </div>
 
         {aiState.status === "loaded" && aiState.narrative && (
-          <p className="mt-4 max-w-3xl text-sm leading-6 text-(--antarctica-charcoal)/80 italic">
+          <p className="mt-4 max-w-3xl text-sm leading-6 text-secondary/80 italic">
             <InlineMarkdown text={aiState.narrative} />
           </p>
         )}
@@ -162,17 +160,15 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
       />
 
       {/* Mobile cards */}
-      <div className="divide-y divide-(--antarctica-line) md:hidden">
+      <div className="divide-y divide-border md:hidden">
         {visibleRows.map((row) => {
           const rationale = getRationale(row);
           return (
             <article key={row.assetId} className="p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-(--antarctica-ink)">{row.ticker}</h3>
-                  <p className="mt-1 text-sm leading-6 text-(--antarctica-charcoal)/70">
-                    {row.name}
-                  </p>
+                  <h3 className="text-lg font-semibold text-ink">{row.ticker}</h3>
+                  <p className="mt-1 text-sm leading-6 text-secondary/70">{row.name}</p>
                 </div>
                 <span
                   className={`rounded-full px-3 py-1 text-sm font-semibold ${
@@ -186,31 +182,31 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
               </div>
 
               <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-2xl bg-(--antarctica-ice-light) p-3">
-                  <dt className="text-(--antarctica-charcoal)/60">Current</dt>
-                  <dd className="mt-1 font-semibold text-(--antarctica-charcoal)">
+                <div className="rounded-2xl bg-primary-subtle p-3">
+                  <dt className="text-secondary/60">Current</dt>
+                  <dd className="mt-1 font-semibold text-secondary">
                     {formatPercent(row.currentWeight)}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-(--antarctica-ice-light) p-3">
-                  <dt className="text-(--antarctica-charcoal)/60">Recommended</dt>
-                  <dd className="mt-1 font-semibold text-(--antarctica-ink)">
+                <div className="rounded-2xl bg-primary-subtle p-3">
+                  <dt className="text-secondary/60">Recommended</dt>
+                  <dd className="mt-1 font-semibold text-ink">
                     {formatPercent(row.recommendedWeight)}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-(--antarctica-stone) p-3">
-                  <dt className="text-(--antarctica-charcoal)/60">Sector</dt>
-                  <dd className="mt-1 font-semibold text-(--antarctica-charcoal)">{row.sector}</dd>
+                <div className="rounded-2xl bg-surface p-3">
+                  <dt className="text-secondary/60">Sector</dt>
+                  <dd className="mt-1 font-semibold text-secondary">{row.sector}</dd>
                 </div>
-                <div className="rounded-2xl bg-(--antarctica-stone) p-3">
-                  <dt className="text-(--antarctica-charcoal)/60">Score</dt>
-                  <dd className="mt-1 font-semibold text-(--antarctica-charcoal)">
+                <div className="rounded-2xl bg-surface p-3">
+                  <dt className="text-secondary/60">Score</dt>
+                  <dd className="mt-1 font-semibold text-secondary">
                     {formatScore(row.riskAdjustedScore)}
                   </dd>
                 </div>
               </dl>
 
-              <div className="mt-4 text-sm leading-6 text-(--antarctica-charcoal)/75">
+              <div className="mt-4 text-sm leading-6 text-secondary/75">
                 {isLoadingAi ? (
                   <TextLineSkeleton lines={3} />
                 ) : (
@@ -224,8 +220,8 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
 
       {/* Desktop table */}
       <div className="hidden overflow-x-auto md:block">
-        <table className="min-w-full divide-y divide-(--antarctica-line) text-sm">
-          <thead className="bg-(--antarctica-ice-light) text-left text-xs font-semibold uppercase tracking-wide text-(--antarctica-charcoal)">
+        <table className="min-w-full divide-y divide-border text-sm">
+          <thead className="bg-primary-subtle text-left text-xs font-semibold uppercase tracking-wide text-secondary">
             <tr>
               {(
                 [
@@ -237,7 +233,7 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
                   <button
                     type="button"
                     onClick={() => handleSortChange(key)}
-                    className="cursor-pointer font-semibold transition-colors hover:text-(--antarctica-ink)"
+                    className="cursor-pointer font-semibold transition-colors hover:text-ink"
                   >
                     {label} {sortIndicator(key)}
                   </button>
@@ -255,7 +251,7 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
                   <button
                     type="button"
                     onClick={() => handleSortChange(key)}
-                    className="cursor-pointer font-semibold transition-colors hover:text-(--antarctica-ink)"
+                    className="cursor-pointer font-semibold transition-colors hover:text-ink"
                   >
                     {label} {sortIndicator(key)}
                   </button>
@@ -264,20 +260,20 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
               <th className="px-6 py-4">Rationale</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-(--antarctica-line) bg-white">
+          <tbody className="divide-y divide-border bg-white">
             {visibleRows.map((row) => {
               const rationale = getRationale(row);
               return (
                 <tr key={row.assetId} className="align-top">
                   <td className="px-6 py-4">
-                    <div className="font-semibold text-(--antarctica-ink)">{row.ticker}</div>
-                    <div className="mt-1 min-w-48 text-(--antarctica-charcoal)/65">{row.name}</div>
+                    <div className="font-semibold text-ink">{row.ticker}</div>
+                    <div className="mt-1 min-w-48 text-secondary/65">{row.name}</div>
                   </td>
-                  <td className="px-6 py-4 text-(--antarctica-charcoal)">{row.sector}</td>
-                  <td className="px-6 py-4 text-right font-medium text-(--antarctica-charcoal)">
+                  <td className="px-6 py-4 text-secondary">{row.sector}</td>
+                  <td className="px-6 py-4 text-right font-medium text-secondary">
                     {formatPercent(row.currentWeight)}
                   </td>
-                  <td className="px-6 py-4 text-right font-semibold text-(--antarctica-ink)">
+                  <td className="px-6 py-4 text-right font-semibold text-ink">
                     {formatPercent(row.recommendedWeight)}
                   </td>
                   <td
@@ -287,10 +283,10 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
                   >
                     {formatSignedPercent(row.weightDelta)}
                   </td>
-                  <td className="px-6 py-4 text-right text-(--antarctica-charcoal)">
+                  <td className="px-6 py-4 text-right text-secondary">
                     {formatScore(row.riskAdjustedScore)}
                   </td>
-                  <td className="max-w-sm px-6 py-4 leading-6 text-(--antarctica-charcoal)/75">
+                  <td className="max-w-sm px-6 py-4 leading-6 text-secondary/75">
                     {isLoadingAi ? (
                       <TextLineSkeleton lines={3} />
                     ) : (
@@ -305,7 +301,7 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
       </div>
 
       {visibleRows.length === 0 && (
-        <div className="p-8 text-center text-sm text-(--antarctica-charcoal)/70">
+        <div className="p-8 text-center text-sm text-secondary/70">
           No assets match the current filters.
         </div>
       )}
@@ -322,7 +318,7 @@ function RationaleContent({ rationale }: { rationale: RationaleResult }) {
           content="Algorithmic rationale — this asset's commentary was generated by the scoring model, not the AI analyst."
           width="w-64"
         >
-          <InfoIcon className="ml-1.5 text-(--antarctica-charcoal)/35 hover:text-(--antarctica-charcoal)/70" />
+          <InfoIcon className="ml-1.5 text-secondary/35 hover:text-secondary/70" />
         </Tooltip>
       )}
     </span>

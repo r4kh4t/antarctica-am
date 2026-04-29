@@ -1,15 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ink: #050505; /* near-black: headings, dark surfaces */
+  --color-primary: #b7d5eb; /* brand ice blue: accent, highlights */
+  --color-primary-subtle: #eef7fc; /* light primary bg */
+  --color-primary-muted: #d8eaf6; /* primary hover state */
+  --color-secondary: #1f2528; /* charcoal: body text, labels */
+  --color-surface: #f5f3ef; /* stone: page and card backgrounds */
+  --color-border: #d8d8d2; /* dividers, rings */
+}
+
 :root {
-  --antarctica-ice: #b7d5eb;
-  --antarctica-ice-light: #eef7fc;
-  --antarctica-ice-muted: #d8eaf6;
-  --antarctica-ink: #050505;
-  --antarctica-charcoal: #1f2528;
-  --antarctica-stone: #f5f3ef;
-  --antarctica-line: #d8d8d2;
-  --background: var(--antarctica-stone);
-  --foreground: var(--antarctica-ink);
+  --background: var(--color-surface);
+  --foreground: var(--color-ink);
 }
 
 body {

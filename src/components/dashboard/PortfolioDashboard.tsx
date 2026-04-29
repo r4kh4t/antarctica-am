@@ -24,10 +24,10 @@ export type AiState =
 
 function KpiCard({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-(--antarctica-line)">
-      <p className="text-sm font-medium text-(--antarctica-charcoal)/65">{label}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-(--antarctica-ink)">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-(--antarctica-charcoal)/65">{detail}</p>
+    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-border">
+      <p className="text-sm font-medium text-secondary/65">{label}</p>
+      <p className="mt-3 text-3xl font-semibold tracking-tight text-ink">{value}</p>
+      <p className="mt-2 text-sm leading-6 text-secondary/65">{detail}</p>
     </div>
   );
 }
@@ -93,11 +93,11 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-      <header className="overflow-hidden rounded-[2rem] bg-(--antarctica-ink) shadow-sm">
+      <header className="overflow-hidden rounded-[2rem] bg-ink shadow-sm">
         <div className="grid gap-8 p-8 text-white lg:grid-cols-[1.1fr_0.9fr] lg:p-10">
           <div>
             <div className="flex items-center gap-4">
-              <div className="rounded-2xl bg-(--antarctica-stone) p-3">
+              <div className="rounded-2xl bg-surface p-3">
                 <Image
                   src="/assets/antarctica-logo.svg"
                   alt="Antarctica Asset Management"
@@ -107,7 +107,7 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
                 />
               </div>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-(--antarctica-ice)">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
                   Portfolio recommendation
                 </p>
                 <p className="mt-1 text-sm text-white/70">As of {recommendation.asOf}</p>
@@ -122,8 +122,8 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
               stakeholder debrief rather than hidden behind a black-box optimiser.
             </p>
           </div>
-          <div className="rounded-3xl bg-(--antarctica-ice)/12 p-6 ring-1 ring-(--antarctica-ice)/30">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--antarctica-ice)">
+          <div className="rounded-3xl bg-primary/12 p-6 ring-1 ring-primary/30">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
               Decision summary
             </p>
             <dl className="mt-5 space-y-5">
