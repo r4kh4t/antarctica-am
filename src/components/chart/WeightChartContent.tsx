@@ -17,7 +17,7 @@ type WeightChartContentProps = {
   rows: RecommendationRow[];
 };
 
-export function WeightChartContent({ rows }: WeightChartContentProps) {
+function WeightChartContent({ rows }: WeightChartContentProps) {
   const chartData = [...rows]
     .sort((left, right) => left.ticker.localeCompare(right.ticker))
     .map((row) => ({
@@ -48,3 +48,9 @@ export function WeightChartContent({ rows }: WeightChartContentProps) {
     </ResponsiveContainer>
   );
 }
+
+// Named export for direct imports (barrel index.ts, tests, etc.)
+export { WeightChartContent };
+// Default export for next/dynamic — avoids the .then(m => m.Named) chain
+// that causes the TS language server to fail module resolution.
+export default WeightChartContent;
