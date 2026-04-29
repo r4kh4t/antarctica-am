@@ -2,7 +2,11 @@ import { after, type NextRequest } from "next/server";
 import { getModelName, isReasoningModel } from "@/lib/llm/client";
 import { getInstructorClient } from "@/lib/llm/instructor";
 import { getTracedOpenAIClient } from "@/lib/llm/observability";
-import { validateRationaleRequest, normalizeRationaleResponse } from "@/lib/llm/guardrails";
+import {
+  validateRationaleRequest,
+  normalizeRationaleResponse,
+  ValidationError,
+} from "@/lib/llm/guardrails";
 import { formatForLLM } from "@/lib/llm/formatters";
 import { assertFitsContext } from "@/lib/llm/tokens";
 import { SYSTEM_PROMPT, PROMPT_VERSION } from "@/lib/llm/prompts/rationale";
@@ -68,9 +72,15 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("[POST /api/rationale]", error);
-    // Report to Rollbar when ROLLBAR_SERVER_TOKEN is configured
-    await captureServerError(error);
     const message = error instanceof Error ? error.message : "Unknown error";
+
+    // Validation errors are the caller's fault — return 400 without Rollbar noise.
+    if (error instanceof ValidationError) {
+      return Response.json({ error: message }, { status: 400 });
+    }
+
+    // Upstream failures (OpenAI, parse errors, etc.) are 500s and worth tracking.
+    await captureServerError(error);
     return Response.json({ error: message }, { status: 500 });
   }
 }

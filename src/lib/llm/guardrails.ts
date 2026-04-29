@@ -1,6 +1,14 @@
 import type { RecommendationRow, SectorExposure } from "@/lib/portfolio/types";
 import type { RationaleResponseShape } from "./schemas";
 
+/** Thrown when the incoming request payload fails business validation. */
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
 export type RationaleRequest = {
   rows: RecommendationRow[];
   sectorExposures: SectorExposure[];
@@ -27,34 +35,34 @@ export type NormalizedRationaleResponse = {
  */
 export function validateRationaleRequest(body: unknown): RationaleRequest {
   if (!body || typeof body !== "object") {
-    throw new Error("Request body must be an object.");
+    throw new ValidationError("Request body must be an object.");
   }
 
   const req = body as RationaleRequest;
 
   if (!Array.isArray(req.rows) || req.rows.length === 0) {
-    throw new Error("rows must be a non-empty array.");
+    throw new ValidationError("rows must be a non-empty array.");
   }
 
   for (const row of req.rows) {
     if (typeof row.assetId !== "string") {
-      throw new Error("Each row must have a string assetId.");
+      throw new ValidationError("Each row must have a string assetId.");
     }
     if (typeof row.currentWeight !== "number" || row.currentWeight < 0 || row.currentWeight > 1) {
-      throw new Error(`currentWeight out of range for ${row.assetId}.`);
+      throw new ValidationError(`currentWeight out of range for ${row.assetId}.`);
     }
     if (
       typeof row.recommendedWeight !== "number" ||
       row.recommendedWeight < 0 ||
       row.recommendedWeight > 1
     ) {
-      throw new Error(`recommendedWeight out of range for ${row.assetId}.`);
+      throw new ValidationError(`recommendedWeight out of range for ${row.assetId}.`);
     }
   }
 
   const weightSum = req.rows.reduce((sum, row) => sum + row.recommendedWeight, 0);
   if (Math.abs(weightSum - 1) > 0.01) {
-    throw new Error(`Recommended weights sum to ${weightSum.toFixed(4)}, expected ~1.`);
+    throw new ValidationError(`Recommended weights sum to ${weightSum.toFixed(4)}, expected ~1.`);
   }
 
   return req;
