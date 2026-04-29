@@ -161,6 +161,15 @@ export function buildPortfolioRecommendation(
     })
     .sort((left, right) => right.recommendedWeight - left.recommendedWeight);
 
+  const assetMonthlyReturns = metrics.flatMap((metric) =>
+    metric.monthlyReturns.map((mr) => ({
+      assetId: metric.asset.assetId,
+      ticker: metric.asset.ticker,
+      month: mr.month,
+      return: mr.return,
+    })),
+  );
+
   return {
     asOf: holdings.asOf,
     currency: holdings.currency,
@@ -169,6 +178,7 @@ export function buildPortfolioRecommendation(
     sectorExposures,
     benchmarkName: benchmark.name,
     benchmarkMonthlyReturns,
+    assetMonthlyReturns,
     summary: {
       expectedMonthlyReturn: weightedAverage(
         metrics,

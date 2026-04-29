@@ -8,7 +8,7 @@ import { AI_STATUS, API_ROUTES } from "@/lib/constants";
 import type { AiState } from "@/lib/constants";
 import { MethodologyCard } from "./MethodologyCard";
 import { RecommendationTable } from "@/components/table";
-import { WeightChart } from "@/components/chart";
+import { AnalyticsSection, WeightChart } from "@/components/chart";
 
 type PortfolioDashboardProps = {
   recommendation: PortfolioRecommendation;
@@ -169,6 +169,10 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
       <div className="mt-8 grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
         <WeightChart rows={recommendation.rows} />
         <MethodologyCard recommendation={recommendation} aiState={aiState} />
+      </div>
+
+      <div className="mt-8">
+        <AnalyticsSection recommendation={recommendation} />
       </div>
 
       <div className="mt-8">

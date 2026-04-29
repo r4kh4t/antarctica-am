@@ -103,6 +103,13 @@ export type PortfolioSummary = {
   benchmarkAverageMonthlyReturn: number;
 };
 
+export type AssetMonthlyReturn = {
+  assetId: string;
+  ticker: string;
+  month: string;
+  return: number;
+};
+
 export type PortfolioRecommendation = {
   asOf: string;
   currency: string;
@@ -112,5 +119,6 @@ export type PortfolioRecommendation = {
   summary: PortfolioSummary;
   benchmarkName: string;
   benchmarkMonthlyReturns: { month: string; return: number }[];
+  assetMonthlyReturns: AssetMonthlyReturn[];
   methodology: string[];
 };

@@ -9,6 +9,20 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.1.0] — 2026-04-30
+
+### Added
+- **Performance chart** (`AnalyticsSection` → "Performance" tab): cumulative growth-of-100 line chart per asset + dashed benchmark overlay. Controls: native `<input type="month">` date-range pickers to re-base the index to any sub-period; per-series pill toggles to show/hide individual asset lines and the benchmark.
+- **Risk / Return scatter** (`AnalyticsSection` → "Risk / Return" tab): annualised volatility (X) vs annualised return (Y) scatter chart. Bubble size encodes recommended weight; colour encodes sector. Custom tooltip shows full asset details.
+- **Sector chart** (`AnalyticsSection` → "Sectors" tab): grouped bar chart of sector allocation current vs recommended. Recommended bars coloured by constraint status (green = within, amber = below, red = above); dashed ceiling reference lines per sector.
+- **`AnalyticsSection`**: tabbed panel (Performance / Risk-Return / Sectors) below the weight chart and methodology card.
+- **`AssetMonthlyReturn` type** in `types.ts`; `assetMonthlyReturns` field added to `PortfolioRecommendation` and populated by `buildPortfolioRecommendation`.
+
+### Changed
+- **`WeightChartContent`**: replaced static Recharts `<Legend>` with interactive toggle pills for Current / Recommended bars — clicking greys out and hides the corresponding series.
+
+---
+
 ## [1.0.0] — 2026-04-30
 
 ### Added
