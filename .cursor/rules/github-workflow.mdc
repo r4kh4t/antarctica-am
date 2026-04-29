@@ -1,0 +1,78 @@
+---
+description: GitHub issue and PR workflow for this project
+globs: ["src/**", "docs/**", ".github/**"]
+alwaysApply: true
+---
+
+# GitHub Workflow
+
+## Issues
+
+Every piece of meaningful work has a GitHub issue at
+**https://github.com/r4kh4t/antarctica-am-draft/issues**
+
+### When to open an issue
+
+Open one before starting any `feat`, `fix`, or `refactor` work:
+
+```bash
+# Feature
+gh issue create --title "feat: <short description>" --label "feature" \
+  --milestone "v0.9.0 — Refinement"
+
+# Bug
+gh issue create --title "fix: <short description>" --label "bug" \
+  --milestone "v0.9.0 — Refinement"
+```
+
+### Labels
+
+| Label | Use |
+|---|---|
+| `feature` | New feature or enhancement |
+| `bug` | Something broken or incorrect |
+| `refactor` | Code restructure, no behaviour change |
+| `infrastructure` | CI/CD, tooling, hooks, devex |
+| `documentation` | Docs, changelog, comments |
+
+### Milestones
+
+| Milestone | Status | Use |
+|---|---|---|
+| `v0.8.0 — Initial Delivery` | closed | All delivered take-home features |
+| `v0.9.0 — Refinement` | open | Post-submission improvements |
+
+## Commit Message Linkage
+
+For `feat`, `fix`, and `refactor` commits, include the issue number:
+
+```
+feat(llm): add streaming support (#14)
+fix(table): correct sort direction on reload (#15)
+```
+
+The `commit-msg` Husky hook shows an advisory warning if no `#N` is found
+in a `feat`/`fix`/`refactor` commit. It does not block — linking is
+strongly recommended but not hard-enforced.
+
+## PR Template
+
+Every PR uses `.github/pull_request_template.md`, which requires:
+- `Closes #N` in the description (auto-closes the issue on merge)
+- CHANGELOG.md and package.json version updated
+- Tests, lint, build passing
+
+## Project Board
+
+Issues are tracked on the GitHub Project board.
+To create it (requires `project` scope):
+
+```bash
+bash scripts/create-project-board.sh
+```
+
+To grant the scope first:
+
+```bash
+gh auth refresh -h github.com -s project
+```

@@ -9,6 +9,22 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [0.9.0] — 2026-04-30
+
+### Added
+- `.github/ISSUE_TEMPLATE/feature.md`, `.github/ISSUE_TEMPLATE/bug.md`: structured issue templates with acceptance criteria.
+- `.github/pull_request_template.md`: PR checklist requiring issue linkage, CHANGELOG, version bump, and CI.
+- `scripts/create-project-board.sh`: one-shot script to create GitHub Projects v2 board and add all 13 issues (run after granting `project` scope).
+- `.cursor/rules/github-workflow.mdc`: AI rule documenting issue/PR/board workflow and commit linkage convention.
+- 13 GitHub Issues created (#1–#13), labelled, assigned to milestone `v0.8.0`, and closed as completed.
+- 5 labels created: `feature`, `bug`, `refactor`, `infrastructure`, `documentation`.
+- 2 milestones: `v0.8.0 — Initial Delivery` (closed), `v0.9.0 — Refinement` (open).
+
+### Changed
+- `.husky/commit-msg`: show advisory tip when `feat`/`fix`/`refactor` commits omit a `#N` issue reference.
+
+---
+
 ## [0.8.0] — 2026-04-30
 
 ### Added
