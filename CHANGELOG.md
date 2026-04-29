@@ -9,6 +9,13 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.5.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.4.0...antarctica-portfolio-recommendation-v1.5.0) (2026-04-29)
+
+
+### Features
+
+* **ui:** richer Decision summary, portal tooltips with border ([e693323](https://github.com/r4kh4t/antarctica-am-draft/commit/e693323a141ac51dbdd020cb3c57a86464e4da91))
+
 ## [1.4.1] — 2026-04-30
 
 ### Changed
