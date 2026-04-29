@@ -85,7 +85,7 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-      <header className="overflow-hidden rounded-[2rem] bg-ink shadow-sm">
+      <header className="overflow-hidden rounded-4xl bg-ink shadow-sm">
         <div className="grid gap-8 p-8 text-white lg:grid-cols-[1.1fr_0.9fr] lg:p-10">
           <div>
             <div className="flex items-center gap-4">
@@ -99,7 +99,7 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
                 />
               </div>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
+                <p className="text-sm font-semibold uppercase tracking-label-lg text-primary">
                   Portfolio recommendation
                 </p>
                 <p className="mt-1 text-sm text-white/70">As of {recommendation.asOf}</p>
@@ -115,7 +115,7 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
             </p>
           </div>
           <div className="rounded-3xl bg-primary/12 p-6 ring-1 ring-primary/30">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+            <p className="text-sm font-semibold uppercase tracking-label text-primary">
               Decision summary
             </p>
             <dl className="mt-5 space-y-5">

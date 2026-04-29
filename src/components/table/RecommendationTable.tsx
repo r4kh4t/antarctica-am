@@ -112,7 +112,7 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
       <div className="border-b border-border p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-secondary">
+            <p className="text-sm font-semibold uppercase tracking-label text-secondary">
               Recommendation
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-ink">Proposed asset weights</h2>

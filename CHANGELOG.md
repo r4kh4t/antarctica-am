@@ -11,6 +11,12 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 ### Added
 - `.cursor/rules/tailwind.mdc` — Tailwind v4 token convention rule; documents `@theme` usage, full token reference table, and when `(--*)` is still appropriate.
+- `globals.css @theme`: add named letter-spacing tokens (`--tracking-label-sm`, `--tracking-label`, `--tracking-label-lg`) so tracking values live in CSS, not in JSX strings.
+
+### Changed
+- `PortfolioDashboard`: replace `rounded-[2rem]` with `rounded-4xl`; replace all `tracking-[0.2em]`/`tracking-[0.24em]` with named tokens.
+- `MethodologyCard`, `RecommendationTable`, `WeightChart`, `TableControls`: replace all `tracking-[Xem]` arbitrary values with `tracking-label`, `tracking-label-sm`, `tracking-label-lg`.
+- `tailwind.mdc`: add "no arbitrary rem/em" rule with full token reference tables for colours and letter-spacing.
 
 ### Changed
 - **Design token refactor** — `globals.css` `:root` variables replaced with a Tailwind v4 `@theme` block; brand tokens renamed from `--antarctica-*` to semantic names (`--color-ink`, `--color-primary`, `--color-primary-subtle`, `--color-primary-muted`, `--color-secondary`, `--color-surface`, `--color-border`). All 8 component files updated to use plain utility classes (`bg-ink`, `text-primary`, `ring-border`, etc.) — no more `(--*)` wrappers for brand colours. Zero functional or visual change.

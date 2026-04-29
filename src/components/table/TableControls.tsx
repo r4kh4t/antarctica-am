@@ -54,7 +54,7 @@ function PillGroup<T extends string>({
 }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-secondary/60">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-label-sm text-secondary/60">
         {label}
       </p>
       <div className="flex flex-wrap gap-1.5">
@@ -100,7 +100,7 @@ export function TableControls({
     <div className="border-b border-border bg-surface/60">
       <div className="grid gap-5 p-5 md:grid-cols-[1.4fr_1fr_1fr] md:p-6">
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-secondary/60">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-label-sm text-secondary/60">
             Search
           </p>
           <input
@@ -129,7 +129,7 @@ export function TableControls({
 
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 px-5 py-3 md:px-6">
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-secondary/60">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-label-sm text-secondary/60">
             Sort by
           </p>
           <div className="flex flex-wrap gap-1.5">

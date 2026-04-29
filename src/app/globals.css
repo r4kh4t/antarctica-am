@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
 @theme {
+  /* Colours */
   --color-ink: #050505; /* near-black: headings, dark surfaces */
-  --color-primary: #b7d5eb; /* brand ice blue: accent, highlights */
+  --color-primary: #b7d5eb; /* brand accent blue: accent, highlights */
   --color-primary-subtle: #eef7fc; /* light primary bg */
   --color-primary-muted: #d8eaf6; /* primary hover state */
   --color-secondary: #1f2528; /* charcoal: body text, labels */
   --color-surface: #f5f3ef; /* stone: page and card backgrounds */
   --color-border: #d8d8d2; /* dividers, rings */
+
+  /* Letter-spacing — use these instead of tracking-[Xem] */
+  --tracking-label-sm: 0.15em; /* small controls labels */
+  --tracking-label: 0.2em; /* standard uppercase section labels */
+  --tracking-label-lg: 0.24em; /* wider brand label in header */
 }
 
 :root {

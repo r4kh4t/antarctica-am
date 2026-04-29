@@ -15,7 +15,7 @@ export function MethodologyCard({ recommendation, aiState }: MethodologyCardProp
   return (
     <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="rounded-3xl bg-ink p-6 text-white shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Methodology</p>
+        <p className="text-sm font-semibold uppercase tracking-label text-primary">Methodology</p>
         <h2 className="mt-2 text-2xl font-semibold">How the recommendation was produced</h2>
         <ul className="mt-5 space-y-3 text-sm leading-6 text-white/78">
           {recommendation.methodology.map((item) => (
@@ -28,7 +28,7 @@ export function MethodologyCard({ recommendation, aiState }: MethodologyCardProp
       </div>
       <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-secondary">
+          <p className="text-sm font-semibold uppercase tracking-label text-secondary">
             Soft constraints
           </p>
           {aiState.status === AI_STATUS.LOADING && (

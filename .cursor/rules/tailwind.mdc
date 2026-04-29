@@ -61,18 +61,63 @@ ring-primary/30        // 30% opacity ring
 bg-primary/12          // 12% opacity background
 ```
 
+## No Arbitrary `rem` or `em` in Components
+
+Never use `[Xrem]` or `[Xem]` as arbitrary values in JSX class strings.
+
+```tsx
+// Wrong
+rounded-[2rem]
+tracking-[0.2em]
+text-[0.65rem]
+gap-[1.5rem]
+
+// Correct — use built-in scale
+rounded-4xl        // 2rem
+text-sm            // 0.875rem
+gap-6              // 1.5rem
+
+// Correct — define a named @theme token for values with no built-in
+tracking-label     // defined in globals.css @theme as --tracking-label: 0.2em
+```
+
+**Rule:** if no built-in Tailwind class covers the value, add a named token to
+`@theme` in `src/app/globals.css`, then reference it by name in components.
+The em/rem lives in CSS — not in JSX strings.
+
+## Design Token Reference
+
+### Colours
+
+| Utility | CSS variable | Hex | Role |
+|---|---|---|---|
+| `ink` | `--color-ink` | `#050505` | Near-black — headings, dark surfaces |
+| `primary` | `--color-primary` | `#b7d5eb` | Brand accent blue |
+| `primary-subtle` | `--color-primary-subtle` | `#eef7fc` | Light primary background |
+| `primary-muted` | `--color-primary-muted` | `#d8eaf6` | Primary hover state |
+| `secondary` | `--color-secondary` | `#1f2528` | Body text, labels |
+| `surface` | `--color-surface` | `#f5f3ef` | Page and card backgrounds |
+| `border` | `--color-border` | `#d8d8d2` | Dividers, rings |
+
+### Letter-spacing
+
+| Utility | CSS variable | Value | Usage |
+|---|---|---|---|
+| `tracking-label-sm` | `--tracking-label-sm` | `0.15em` | Small controls labels |
+| `tracking-label` | `--tracking-label` | `0.2em` | Standard uppercase section labels |
+| `tracking-label-lg` | `--tracking-label-lg` | `0.24em` | Wide brand label in header |
+
 ## When `(--*)` Is Still Correct
 
 Only use `(--*)` for CSS variables that are **not** in `@theme` — for example,
 one-off values defined in `:root` or inline styles you cannot express as a
 Tailwind utility.
 
-## Arbitrary Values
+## Arbitrary Values — Allowed Cases
 
-For fixed non-token values, still use `[]`:
+`[]` is still appropriate for layout values that are not design tokens:
 
 ```tsx
-text-[0.65rem]
-tracking-[0.2em]
-grid-cols-[1.1fr_0.9fr]
+grid-cols-[1.1fr_0.9fr]    // fractional grid ratios — no token needed
+max-w-[theme(spacing.prose)] // theme() references
 ```
