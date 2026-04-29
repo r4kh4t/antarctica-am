@@ -9,6 +9,13 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.2.2](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.2.1...antarctica-portfolio-recommendation-v1.2.2) (2026-04-29)
+
+
+### CI / Tooling
+
+* set release-please branch name to chore/release ([42a91fb](https://github.com/r4kh4t/antarctica-am-draft/commit/42a91fb18bf36cf5abbbd841d956799f2d1685d0))
+
 ## [1.2.1](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.2.0...antarctica-portfolio-recommendation-v1.2.1) (2026-04-29)
 
 
