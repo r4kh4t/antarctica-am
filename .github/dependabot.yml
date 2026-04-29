@@ -1,0 +1,62 @@
+version: 2
+
+updates:
+  # ── npm dependencies ────────────────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Almaty"
+    open-pull-requests-limit: 10
+    labels:
+      - "infrastructure"
+    milestone: 2 # v0.9.0 — Refinement
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    # Group minor + patch updates into a single PR to reduce noise.
+    # Major bumps always get individual PRs so they are reviewed separately.
+    groups:
+      production-minor-patch:
+        applies-to: version-updates
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-minor-patch:
+        applies-to: version-updates
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Pin major versions of core framework packages — upgrade intentionally.
+    ignore:
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+
+  # ── GitHub Actions ───────────────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Almaty"
+    open-pull-requests-limit: 5
+    labels:
+      - "infrastructure"
+    milestone: 2 # v0.9.0 — Refinement
+    commit-message:
+      prefix: "ci"
+      include: "scope"

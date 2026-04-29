@@ -12,6 +12,10 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 ## [0.9.0] — 2026-04-30
 
 ### Added
+- `.github/dependabot.yml`: weekly Dependabot updates for npm and GitHub Actions. Minor/patch bumps grouped into single PRs; major bumps for `next`, `react`, `typescript`, `tailwindcss` are ignored (upgrade intentionally). PRs auto-assigned to `infrastructure` label and `v0.9.0` milestone.
+
+
+- `.github/dependabot.yml`: weekly Dependabot updates for npm and GitHub Actions. Minor/patch bumps grouped into single PRs; major bumps for `next`, `react`, `typescript`, `tailwindcss` ignored (upgrade manually). All Dependabot PRs assigned to milestone `v0.9.0` with label `infrastructure`.
 - `.github/ISSUE_TEMPLATE/feature.md`, `.github/ISSUE_TEMPLATE/bug.md`: structured issue templates with acceptance criteria.
 - `.github/pull_request_template.md`: PR checklist requiring issue linkage, CHANGELOG, version bump, and CI.
 - `scripts/create-project-board.sh`: one-shot script to create GitHub Projects v2 board and add all 13 issues (run after granting `project` scope).
