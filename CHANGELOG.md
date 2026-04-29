@@ -9,6 +9,20 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [Unreleased]
+
+### Added
+- `src/lib/llm/cache.ts`: in-process rationale cache using a module-level Map with 1-hour TTL. Exposes `buildRationaleCacheKey` (SHA-256, key-order stable), `getCachedRationale`, `setCachedRationale`, and `clearRationaleCache` (for tests).
+- `src/lib/llm/cache.test.ts`: 7 unit / integration tests — hash determinism, get/set/expiry, and a route-level test verifying OpenAI is called only once for identical payloads.
+- `vitest.config.ts`: `resolve.alias` for `@/` → `src/` (enables route integration test from any directory).
+
+### Changed
+- `POST /api/rationale`: checks the cache before calling OpenAI; stores the response after a cache miss; returns `cached: true` in the JSON body on a hit.
+
+Closes #18
+
+---
+
 ## [1.2.3](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.2.2...antarctica-portfolio-recommendation-v1.2.3) (2026-04-29)
 
 
