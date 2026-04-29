@@ -19,12 +19,21 @@
   },
   "dependencies": {
     "@instructor-ai/instructor": "^1.7.0",
+    "@langfuse/openai": "^5.2.0",
+    "@langfuse/otel": "^5.2.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.215.0",
+    "@opentelemetry/sdk-trace-node": "^2.7.0",
+    "@rollbar/react": "^1.0.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "langfuse": "^3.38.20",
     "next": "^16.2.4",
     "openai": "^6.35.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "recharts": "^3.8.1"
+    "react-is": "^19.2.5",
+    "recharts": "^3.8.1",
+    "rollbar": "^3.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.13",
