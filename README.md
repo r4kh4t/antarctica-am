@@ -59,7 +59,9 @@ This is deliberately not a black-box optimiser. For a small internal fund and a 
 ## Application Structure
 
 - `src/app/page.tsx`: server-rendered dashboard entry point
-- `src/components/`: presentational dashboard components and chart
+- `src/components/`: grouped into `dashboard/`, `chart/`, `table/`, and `shared/` subdirectories
+- `src/lib/llm/`: OpenAI client, token estimation, guardrails, formatters, versioned prompts
+- `src/app/api/rationale/`: POST route that generates AI rationale via GPT
 - `src/lib/portfolio/`: data loading, monthly return calculation, constraints, recommendation logic, formatting, and tests
 - `docs/`: architecture, methodology, development workflow, and AI workflow notes
 - `.cursor/`: project rules, hooks, and skills used to guide AI-assisted development
@@ -72,6 +74,7 @@ This is deliberately not a black-box optimiser. For a small internal fund and a 
 - [Development workflow](docs/development-workflow.md)
 - [AI workflow](docs/ai-workflow.md)
 - [Brand notes](docs/brand-notes.md)
+- [LLM integration](docs/llm-integration.md)
 
 ## AI Usage
 
@@ -80,9 +83,12 @@ AI assistance was used to speed up scaffolding, implementation, and review. The 
 - `.cursor/rules/project-engineering.mdc`
 - `.cursor/rules/next-react-boundaries.mdc`
 - `.cursor/rules/portfolio-domain.mdc`
+- `.cursor/rules/llm-integration.mdc`
 - `.cursor/hooks.json`
 - `.cursor/skills/portfolio-recommendation/SKILL.md`
 - `.cursor/skills/assignment-code-review/SKILL.md`
+
+The AI rationale feature uses OpenAI GPT-4o (configurable to o4-mini for reasoning) to generate per-asset commentary. Data is formatted as markdown tables before being sent to the model. Langfuse observability is optionally available via `.env.local`.
 
 Generated output was validated with tests, linting, and a production build. Final implementation decisions remain intentionally simple and reviewable.
 

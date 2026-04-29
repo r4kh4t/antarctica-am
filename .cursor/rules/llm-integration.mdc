@@ -1,0 +1,41 @@
+---
+description: Guidelines for working with LLM calls in this project
+globs: ["src/lib/llm/**", "src/app/api/rationale/**"]
+alwaysApply: false
+---
+
+# LLM Integration Standards
+
+## Architecture
+- All LLM calls go through server-side Next.js Route Handlers (`src/app/api/`). Never call the OpenAI API from client components — the key must stay server-only.
+- The OpenAI client is a singleton in `src/lib/llm/client.ts`. Always import via `getOpenAIClient()`.
+
+## Prompt Engineering
+- **Version every prompt.** Change `PROMPT_VERSION` in `src/lib/llm/prompts/rationale.ts` when the system prompt changes materially. Add a changelog entry.
+- **Format data as markdown tables** using `src/lib/llm/formatters.ts` — structured tables dramatically improve LLM comprehension of numerical portfolio data.
+- Keep temperature low (≤ 0.3) for financial content to reduce hallucination risk.
+- Include chain-of-thought instructions ("consider X, then Y") in the system prompt for complex reasoning tasks.
+
+## Guardrails
+- **Always validate inputs** with `validateRationaleRequest()` before sending to the LLM.
+- **Always validate outputs** with `validateRationaleResponse()` — never trust raw LLM JSON blindly.
+- Use `response_format: { type: "json_object" }` for structured outputs on non-reasoning models.
+- Provide a graceful fallback (algorithmic rationale) when AI generation fails — never leave the user with a broken UI.
+
+## Token Management
+- Call `assertFitsContext(prompt, model)` before every LLM call to catch budget overruns early.
+- Use `estimateTokens()` for pre-call budget checks; log `response.usage.total_tokens` post-call.
+
+## Observability (Langfuse)
+- Wrap all LLM calls with `traceLLMCall()` from `src/lib/llm/langfuse.ts`.
+- Langfuse is **opt-in** — set `LANGFUSE_SECRET_KEY` + `LANGFUSE_PUBLIC_KEY` in `.env.local` to enable. Omit them to disable silently.
+- Always include `promptVersion` in trace metadata so rollbacks are auditable.
+
+## Reasoning (o-series) Models
+- o1/o3/o4-mini do not support `temperature` or `response_format: json_object` on all API versions — use `isReasoningModel()` to gate these params.
+- For structured JSON from reasoning models, instruct the model in the prompt: "Return ONLY a JSON object with no markdown fences."
+
+## Security
+- `OPENAI_API_KEY` must live only in `.env.local` (gitignored). Never hardcode it.
+- Never log full prompt or response content in production — use Langfuse for observability instead.
+- Rotate the API key immediately if it appears in source code, PR diffs, or chat logs.

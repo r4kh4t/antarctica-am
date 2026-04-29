@@ -2,8 +2,8 @@ import Image from "next/image";
 import { formatPercent } from "@/lib/portfolio/format";
 import type { PortfolioRecommendation } from "@/lib/portfolio/types";
 import { MethodologyCard } from "./MethodologyCard";
-import { RecommendationTable } from "./RecommendationTable";
-import { WeightChart } from "./WeightChart";
+import { RecommendationTable } from "@/components/table";
+import { WeightChart } from "@/components/chart";
 
 type PortfolioDashboardProps = {
   recommendation: PortfolioRecommendation;
@@ -115,7 +115,7 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
       </div>
 
       <div className="mt-8">
-        <RecommendationTable rows={recommendation.rows} />
+        <RecommendationTable recommendation={recommendation} />
       </div>
     </main>
   );

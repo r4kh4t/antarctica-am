@@ -1,4 +1,4 @@
-import { PortfolioDashboard } from "@/components/PortfolioDashboard";
+import { PortfolioDashboard } from "@/components/dashboard";
 import { getPortfolioData } from "@/lib/portfolio/data";
 import { buildPortfolioRecommendation } from "@/lib/portfolio/recommendation";
 
