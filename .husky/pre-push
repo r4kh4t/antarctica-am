@@ -1,0 +1,43 @@
+#!/bin/sh
+# Enforce branch naming convention before any push.
+#
+# Allowed patterns:
+#   main | develop | staging              — protected long-lived branches
+#   feat/<description>                    — new features
+#   fix/<description>                     — bug fixes
+#   hotfix/<description>                  — urgent production fixes
+#   chore/<description>                   — maintenance, deps, tooling
+#   docs/<description>                    — documentation only
+#   refactor/<description>                — code structure changes
+#   test/<description>                    — adding or updating tests
+#   ci/<description>                      — CI/CD changes
+#   perf/<description>                    — performance improvements
+#   release/<semver>                      — release branches (e.g. release/1.2.0)
+#
+# Description must use lowercase letters, numbers, and hyphens only.
+#
+# Good:  feat/add-langfuse-tracing
+# Bad:   AddLangfuseTracing
+# Bad:   my-branch
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+pattern='^(main|develop|staging)$|^(feat|fix|hotfix|chore|docs|refactor|test|ci|perf|release)/[a-z0-9][a-z0-9._-]{0,49}$'
+
+if ! echo "$branch" | grep -qE "$pattern"; then
+  echo ""
+  echo "  ✗ Branch name '$branch' does not follow naming conventions."
+  echo ""
+  echo "  Required format: <type>/<description>"
+  echo "  Description must be lowercase, numbers, hyphens, dots, underscores (max 50 chars)."
+  echo ""
+  echo "  Examples:"
+  echo "    feat/add-langfuse-tracing"
+  echo "    fix/missing-rationale-keys"
+  echo "    chore/update-dependencies"
+  echo "    release/1.2.0"
+  echo ""
+  echo "  Protected branches: main  develop  staging"
+  echo ""
+  exit 1
+fi
