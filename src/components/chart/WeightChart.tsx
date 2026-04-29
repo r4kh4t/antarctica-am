@@ -1,7 +1,7 @@
 "use client";
 
 import type { RecommendationRow } from "@/lib/portfolio/types";
-import { WeightChartContent } from "./WeightChartContent";
+import { WeightChartContent } from "@/components/chart/WeightChartContent";
 
 type WeightChartProps = {
   rows: RecommendationRow[];

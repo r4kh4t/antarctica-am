@@ -11,6 +11,10 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ## [0.9.0] — 2026-04-30
 
+### Fixed
+- `WeightChart.tsx`: use absolute `@/components/chart/WeightChartContent` import path for clarity
+- `rationale.ts`: replace Unicode en-dash ranges with ASCII hyphens (Biome normalisation)
+
 ### Added
 - `.github/dependabot.yml`: weekly Dependabot updates for npm and GitHub Actions. Minor/patch bumps grouped into single PRs; major bumps for `next`, `react`, `typescript`, `tailwindcss` are ignored (upgrade intentionally). PRs auto-assigned to `infrastructure` label and `v0.9.0` milestone.
 
