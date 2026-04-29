@@ -7,13 +7,32 @@ import { formatForLLM } from "@/lib/llm/formatters";
 import { assertFitsContext } from "@/lib/llm/tokens";
 import { SYSTEM_PROMPT, PROMPT_VERSION } from "@/lib/llm/prompts/rationale";
 import { RationaleResponseSchema } from "@/lib/llm/schemas";
+import { buildRationaleCacheKey, getCachedRationale, setCachedRationale } from "@/lib/llm/cache";
 import { langfuseSpanProcessor } from "@/instrumentation";
 import { captureServerError } from "@/lib/rollbar";
+
+type RouteResponse = {
+  narrative: string;
+  rationale: Record<string, string>;
+  sectorInsights: Record<string, string>;
+  model: string;
+  promptVersion: string;
+  tokensUsed: number;
+  cached?: boolean;
+};
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const validated = validateRationaleRequest(body);
+
+    // Return cached result immediately if the portfolio state hasn't changed.
+    const cacheKey = buildRationaleCacheKey(validated);
+    const cached = getCachedRationale<RouteResponse>(cacheKey);
+    if (cached) {
+      console.info("[POST /api/rationale] cache hit", cacheKey.slice(0, 8));
+      return Response.json({ ...cached, cached: true });
+    }
 
     const userMessage = formatForLLM(validated);
     const model = getModelName();
@@ -60,12 +79,16 @@ export async function POST(req: NextRequest) {
 
     const safe = normalizeRationaleResponse(result!, validated.rows);
 
-    return Response.json({
+    const responseBody: RouteResponse = {
       ...safe,
       model,
       promptVersion: PROMPT_VERSION,
       tokensUsed: totalTokens,
-    });
+    };
+
+    setCachedRationale(cacheKey, responseBody);
+
+    return Response.json(responseBody);
   } catch (error: unknown) {
     console.error("[POST /api/rationale]", error);
     // Report to Rollbar when ROLLBAR_SERVER_TOKEN is configured
