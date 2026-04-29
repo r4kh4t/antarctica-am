@@ -49,6 +49,13 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 * add commit-msg + pre-push hooks and GitHub Actions CI workflow ([175b1b1](https://github.com/r4kh4t/antarctica-am-draft/commit/175b1b1f61ab50d91661c5a5fefe1404763bbcb8))
 * add Dependabot weekly updates for npm and GitHub Actions ([#9](https://github.com/r4kh4t/antarctica-am-draft/issues/9)) ([d8a6bac](https://github.com/r4kh4t/antarctica-am-draft/commit/d8a6bac3cf21ad7a993289af057e16e0a7c9d9f8))
 
+## [1.1.1] — 2026-04-30
+
+### Fixed
+- `SectorChart`: removed `isFront` prop from `<ReferenceLine>` — the prop no longer exists in the installed version of Recharts, causing a TypeScript error. Reference lines still render above grid lines via JSX declaration order.
+
+---
+
 ## [1.1.0] — 2026-04-30
 
 ### Added

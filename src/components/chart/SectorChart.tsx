@@ -123,7 +123,6 @@ export function SectorChart({ sectorExposures }: SectorChartProps) {
                 stroke={STATUS_COLOR[entry.status]}
                 strokeDasharray="4 2"
                 strokeOpacity={0.5}
-                isFront
               />
             ))}
             {showCurrent && (
