@@ -71,6 +71,20 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 * add commit-msg + pre-push hooks and GitHub Actions CI workflow ([175b1b1](https://github.com/r4kh4t/antarctica-am-draft/commit/175b1b1f61ab50d91661c5a5fefe1404763bbcb8))
 * add Dependabot weekly updates for npm and GitHub Actions ([#9](https://github.com/r4kh4t/antarctica-am-draft/issues/9)) ([d8a6bac](https://github.com/r4kh4t/antarctica-am-draft/commit/d8a6bac3cf21ad7a993289af057e16e0a7c9d9f8))
 
+## [Unreleased]
+
+### Added
+- `src/app/api/rationale/route.test.ts`: 3 integration tests for the POST route — success (200 + correct schema), guardrail rejection (400 without Rollbar), and upstream OpenAI failure (500 + `captureServerError` called). All external dependencies mocked with `vi.mock`.
+- `vitest.config.ts`: added `resolve.alias` for `@/` → `src/` so route tests can resolve path aliases without Next.js runtime.
+
+### Changed
+- `validateRationaleRequest` now throws `ValidationError` (new named subclass of `Error` exported from `guardrails.ts`).
+- `POST /api/rationale`: catches `ValidationError` and returns HTTP 400; all other errors continue to return 500 and trigger `captureServerError`.
+
+Closes #21
+
+---
+
 ## [1.1.2] — 2026-04-30
 
 ### Security
