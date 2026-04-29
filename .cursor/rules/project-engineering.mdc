@@ -1,0 +1,13 @@
+---
+description: Core engineering standards for the Antarctica portfolio assignment
+alwaysApply: true
+---
+
+# Project Engineering
+
+- Prefer simple, reviewable changes that support the take-home brief directly.
+- Keep implementation decisions explainable to both technical and non-technical stakeholders.
+- Do not add speculative architecture, background services, or abstractions without a concrete need.
+- Preserve deterministic portfolio outputs so tests, screenshots, and debrief discussion stay stable.
+- After AI-assisted edits, verify the result with relevant tests, linting, and a manual read-through.
+- Document assumptions clearly when the brief intentionally leaves details open.

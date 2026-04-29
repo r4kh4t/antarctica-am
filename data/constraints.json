@@ -1,0 +1,39 @@
+{
+  "asOf": "2025-09-30",
+  "objective": "Prefer assets with stronger monthly risk-adjusted returns while keeping turnover and concentration understandable for stakeholders.",
+  "maxAssetWeight": 0.22,
+  "minAssetWeight": 0.04,
+  "maxTurnover": 0.18,
+  "sectorBounds": [
+    {
+      "sector": "Global Equity",
+      "min": 0.24,
+      "max": 0.38
+    },
+    {
+      "sector": "Fixed Income",
+      "min": 0.22,
+      "max": 0.36
+    },
+    {
+      "sector": "Real Assets",
+      "min": 0.16,
+      "max": 0.28
+    },
+    {
+      "sector": "Alternatives",
+      "min": 0.06,
+      "max": 0.14
+    },
+    {
+      "sector": "Cash",
+      "min": 0.04,
+      "max": 0.12
+    }
+  ],
+  "notes": [
+    "Constraints are soft business preferences, not regulatory limits.",
+    "Recommendation should remain explainable and avoid unnecessary turnover.",
+    "Weights must sum to 100% after rounding."
+  ]
+}

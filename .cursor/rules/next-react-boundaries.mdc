@@ -1,0 +1,14 @@
+---
+description: Next.js and React conventions for this assignment
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Next.js React Boundaries
+
+- Use App Router conventions and keep pages server-rendered unless browser APIs are required.
+- Add `"use client"` only to interactive components or components that depend on client-only libraries.
+- Keep portfolio calculations in `src/lib/portfolio`, not inside React components.
+- Pass typed, serializable data from server components into client components.
+- Prefer small presentational components over broad stateful containers.
+- Avoid fetching or recalculating the same portfolio data from multiple UI layers.

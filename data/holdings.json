@@ -1,0 +1,70 @@
+{
+  "asOf": "2025-09-30",
+  "currency": "GBP",
+  "assets": [
+    {
+      "assetId": "AAM-LGQ",
+      "ticker": "LGQ",
+      "name": "London Global Quality Equity",
+      "sector": "Global Equity",
+      "region": "Global",
+      "currentWeight": 0.18
+    },
+    {
+      "assetId": "AAM-USG",
+      "ticker": "USG",
+      "name": "US Growth Leaders",
+      "sector": "Global Equity",
+      "region": "North America",
+      "currentWeight": 0.14
+    },
+    {
+      "assetId": "AAM-EMD",
+      "ticker": "EMD",
+      "name": "Emerging Markets Debt",
+      "sector": "Fixed Income",
+      "region": "Emerging Markets",
+      "currentWeight": 0.12
+    },
+    {
+      "assetId": "AAM-IGC",
+      "ticker": "IGC",
+      "name": "Investment Grade Credit",
+      "sector": "Fixed Income",
+      "region": "Global",
+      "currentWeight": 0.16
+    },
+    {
+      "assetId": "AAM-INF",
+      "ticker": "INF",
+      "name": "Listed Infrastructure Income",
+      "sector": "Real Assets",
+      "region": "Global",
+      "currentWeight": 0.13
+    },
+    {
+      "assetId": "AAM-REI",
+      "ticker": "REI",
+      "name": "Defensive Real Estate Income",
+      "sector": "Real Assets",
+      "region": "Europe",
+      "currentWeight": 0.1
+    },
+    {
+      "assetId": "AAM-MAC",
+      "ticker": "MAC",
+      "name": "Macro Absolute Return",
+      "sector": "Alternatives",
+      "region": "Global",
+      "currentWeight": 0.09
+    },
+    {
+      "assetId": "AAM-CAS",
+      "ticker": "CAS",
+      "name": "Sterling Liquidity Reserve",
+      "sector": "Cash",
+      "region": "United Kingdom",
+      "currentWeight": 0.08
+    }
+  ]
+}

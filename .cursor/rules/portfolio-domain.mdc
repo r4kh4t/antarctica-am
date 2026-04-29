@@ -1,0 +1,14 @@
+---
+description: Portfolio calculation rules for deterministic and explainable outputs
+globs: "{src/lib/portfolio/**/*.ts,data/**/*.json}"
+alwaysApply: false
+---
+
+# Portfolio Domain
+
+- Optimise on monthly returns by deriving month-end values from daily series.
+- Keep recommendation logic deterministic; do not use randomness without a fixed generator and clear reason.
+- Treat business constraints as soft constraints, but never fail them silently.
+- Return rationale that explains why each asset was increased, reduced, or held.
+- Keep all weights as decimals internally, where `1` equals `100%`.
+- Tests should cover normalization, sparse data, turnover, and constraint behavior.
