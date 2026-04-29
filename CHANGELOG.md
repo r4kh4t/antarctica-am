@@ -9,6 +9,14 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.2.1](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.2.0...antarctica-portfolio-recommendation-v1.2.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* remove isFront prop from ReferenceLine in SectorChart ([df2021e](https://github.com/r4kh4t/antarctica-am-draft/commit/df2021e76984be7ce426e5c52fe59ed24588b789))
+* **security:** force postcss &gt;=8.5.10 via npm overrides (Dependabot [#1](https://github.com/r4kh4t/antarctica-am-draft/issues/1)) ([ef37e9b](https://github.com/r4kh4t/antarctica-am-draft/commit/ef37e9b9ff0c8a72f71463247b255240eec1fa4e))
+
 ## [1.2.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.1.0...antarctica-portfolio-recommendation-v1.2.0) (2026-04-29)
 
 
