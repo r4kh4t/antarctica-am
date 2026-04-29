@@ -30,7 +30,28 @@ npm run format:check
 npm run build
 ```
 
-Pre-commit checks are managed by Husky. Each commit runs staged-file formatting, linting, and unit tests through `npm run precommit`.
+Pre-commit checks are managed by Husky. Each commit runs staged-file formatting, linting, and the full unit test suite. The same steps run in CI via GitHub Actions on every push and pull request.
+
+## Testing
+
+**What is tested and why**
+
+The project covers the code that is both easy to unit-test and most important to get right:
+
+| Test file | What it covers | Why it matters |
+|---|---|---|
+| `src/lib/portfolio/recommendation.test.ts` | Weight scoring, constraint enforcement, turnover, total weight | Core business logic — a wrong allocation recommendation is a real risk |
+| `src/lib/llm/tokens.test.ts` | `estimateTokens`, `getContextLimit`, `assertFitsContext` | Ensures the prompt never silently overflows the model context window |
+| `src/lib/llm/guardrails.test.ts` | `validateRationaleRequest` input validation, `normalizeRationaleResponse` | Prevents bad data reaching the LLM and bad output reaching the UI |
+| `src/lib/llm/formatters.test.ts` | Markdown table structure, asset ID inclusion, percentage formatting | The LLM's answer quality depends entirely on the data it receives |
+| `src/lib/llm/schemas.test.ts` | Zod schema: valid/invalid shapes, length constraints, type inference | Confirms Instructor's structured output contract matches expectations |
+
+**What is intentionally not tested**
+
+- **React components** — the UI layer has no business logic; it is all straightforward conditional rendering and prop threading. Snapshot or interaction tests would be brittle without adding signal.
+- **Integration tests** — calling the real OpenAI API or a live Langfuse instance in tests would be slow, expensive, and flaky. These are covered operationally: every deployment triggers a live rationale call visible in Langfuse.
+- **End-to-end tests** — the app has a single page and no user flows requiring Playwright/Cypress coverage at this stage. E2E tests are the right next step once the scope grows.
+- **`client.ts` / `instructor.ts`** — these are thin wrappers around well-tested third-party SDKs. Testing them would mostly test the libraries themselves, not business logic.
 
 ## Data
 
@@ -101,6 +122,40 @@ npm run build
 ```
 
 After deployment, replace the pending Vercel URL above with the live URL before submitting.
+
+## Vercel Tools
+
+The following free tools are integrated:
+
+| Tool | What it does | Free tier |
+|---|---|---|
+| **Web Analytics** | Privacy-first page views and visitor stats — no cookies, no GDPR issues | 50,000 events/month (Hobby) |
+| **Speed Insights** | Core Web Vitals (LCP, CLS, FID) per real user visit | 10,000 data points/month (Hobby) |
+| **Rollbar** | Real-time error tracking for client and server, with stack traces and deploy tracking | 5,000 events/month (free forever) |
+
+### Rollbar setup
+
+The quickest path is through the Vercel dashboard — it auto-provisions both tokens:
+
+1. Vercel dashboard → **Integrations** → search **Rollbar** → **Install**
+2. Select your project; Rollbar creates the project and sets `NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN` and `ROLLBAR_SERVER_TOKEN` in your Vercel env vars automatically
+3. Redeploy — errors start flowing immediately
+
+For local development, copy the tokens from the Vercel dashboard into `.env.local` (see `.env.example`).
+
+Rollbar captures:
+- Uncaught browser exceptions and promise rejections (via `<RollbarProvider>` in `layout.tsx`)
+- Root layout crashes (via `global-error.tsx`)
+- Server-side API route failures (via `captureServerError()` in `src/lib/rollbar.ts`)
+
+When `NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN` / `ROLLBAR_SERVER_TOKEN` are blank, Rollbar is a no-op and the app behaves normally.
+
+**Other free observability options:**
+
+| Integration | Purpose | Notes |
+|---|---|---|
+| [Checkly](https://vercel.com/integrations/checkly) | Synthetic monitoring (Playwright health checks) | Free tier available |
+| [PostHog](https://vercel.com/integrations/posthog) | Session replay + product analytics | Free tier: 1M events/month |
 
 ## Next Improvements
 

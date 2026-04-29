@@ -2,20 +2,74 @@
 
 ## Overview
 
-The app is a focused Next.js dashboard for producing and explaining a portfolio weight recommendation. It keeps the calculation layer separate from React components so the business logic can be tested independently and discussed in a debrief.
+A focused Next.js 16 dashboard that reads portfolio data, calculates risk-adjusted asset weights, generates AI-powered rationale via GPT, and presents the result in a stakeholder-ready UI. The calculation layer is kept separate from React components so it can be tested independently and discussed in a debrief.
 
 ## Data Flow
 
-1. JSON fixtures live in `data/`.
-2. `src/lib/portfolio/data.ts` loads and validates the basic portfolio shape.
-3. `src/lib/portfolio/monthlyReturns.ts` converts daily prices into month-end monthly returns.
-4. `src/lib/portfolio/recommendation.ts` builds asset metrics, applies scoring, enforces soft constraints, and returns a dashboard-ready result.
-5. `src/app/page.tsx` server-renders the recommendation and passes serializable props to UI components.
-6. `src/components/WeightChartContent.tsx` is dynamically loaded on the client because Recharts needs browser layout measurement.
+```
+data/*.json
+  └─ src/lib/portfolio/data.ts          load + validate fixture data
+       └─ src/lib/portfolio/monthlyReturns.ts   daily prices → month-end returns
+            └─ src/lib/portfolio/recommendation.ts  score assets, apply constraints
+                 └─ src/app/page.tsx    server-render → serializable props
+                      └─ src/components/dashboard/PortfolioDashboard.tsx  (client)
+                           ├─ POST /api/rationale  → GPT-4o → AI commentary
+                           ├─ src/components/table/RecommendationTable.tsx
+                           ├─ src/components/chart/WeightChart.tsx
+                           └─ src/components/dashboard/MethodologyCard.tsx
+```
+
+## Component Groups (`src/components/`)
+
+| Directory | Contents |
+|---|---|
+| `dashboard/` | `PortfolioDashboard` (central AI state), `MethodologyCard` |
+| `table/` | `RecommendationTable`, `TableControls` (filters + sort) |
+| `chart/` | `WeightChart` (server shell), `WeightChartContent` (client, no-SSR) |
+| `shared/` | `Skeleton`, `Tooltip`, `InlineMarkdown` |
+| `providers.tsx` | Client-only provider tree (`RollbarProvider`) |
+
+## LLM Utilities (`src/lib/llm/`)
+
+| File | Purpose |
+|---|---|
+| `client.ts` | Base OpenAI singleton; model name & reasoning-model detection |
+| `observability.ts` | `observeOpenAI`-traced client (Langfuse); falls back to plain client if no credentials |
+| `instructor.ts` | Instructor-wrapped client for structured output + auto-retry |
+| `schemas.ts` | Zod schema for LLM response validation |
+| `guardrails.ts` | Input validation (`validateRationaleRequest`) + output normalisation |
+| `formatters.ts` | Portfolio data → markdown tables (LLM input) |
+| `tokens.ts` | Token estimation, context window guard (`assertFitsContext`) |
+| `prompts/rationale.ts` | Versioned system prompt (`PROMPT_VERSION`) |
+
+## API Route
+
+`POST /api/rationale` — receives portfolio metrics, calls GPT, returns per-asset rationale + narrative.
+
+- Standard models (GPT-4o): Instructor + Zod → structured, validated, auto-retried output
+- Reasoning models (o-series): direct OpenAI call + manual `RationaleResponseSchema.parse()`
+- After response: `langfuseSpanProcessor.forceFlush()` ensures traces reach Langfuse in serverless
+- On error: `captureServerError()` sends the exception to Rollbar (if configured)
+
+## Observability Stack
+
+| Layer | Tool | What it captures |
+|---|---|---|
+| LLM tracing | Langfuse (`@langfuse/openai`) | Prompt, response, tokens, cost, latency |
+| Browser errors | Rollbar (`@rollbar/react`) | Uncaught exceptions, promise rejections |
+| Root crashes | Rollbar (`global-error.tsx`) | Root layout / template failures |
+| Server errors | Rollbar (`captureServerError`) | API route exceptions |
+| Page views | Vercel Web Analytics | Visitors, page views, referrers |
+| Performance | Vercel Speed Insights | Core Web Vitals (LCP, CLS, FID) |
+
+## OpenTelemetry Setup
+
+`src/instrumentation.ts` is a Next.js startup hook that registers a `NodeTracerProvider` with `LangfuseSpanProcessor`. This runs once at server start and is safe in both local and serverless (Vercel) environments.
 
 ## Design Choices
 
-- The page is static because all data is local and deterministic.
-- Portfolio math is kept in plain TypeScript functions, not React hooks.
-- The chart is isolated behind a no-SSR wrapper to keep production builds clean.
-- The recommendation method favors explainability over a black-box optimizer.
+- **Static page** — all data is local and deterministic; no database or auth needed.
+- **Server-side calculation** — portfolio math stays in plain TypeScript functions, not React hooks; keeps it testable and out of the browser bundle.
+- **No-SSR chart** — Recharts needs browser layout measurement; `WeightChartContent` is dynamically imported with `ssr: false`.
+- **Explainable method** — risk-adjusted scoring with transparent constraint handling beats a black-box optimiser for a stakeholder debrief.
+- **Graceful degradation** — missing API keys (OpenAI, Langfuse, Rollbar) all degrade gracefully; the dashboard is always functional.
