@@ -1,0 +1,63 @@
+---
+description: Keep CHANGELOG.md updated as part of every meaningful change
+globs: ["src/**", "docs/**", ".cursor/**", "data/**"]
+alwaysApply: true
+---
+
+# Changelog Maintenance
+
+## Rule
+
+**Every commit that changes behaviour must include a CHANGELOG.md update.**
+The changelog entry is part of the same commit — not a separate one.
+
+## When to Update
+
+Update CHANGELOG.md when the change:
+
+- Adds a new feature, component, API route, or utility
+- Fixes a bug or incorrect output
+- Changes user-facing UI, LLM prompts, data output, or API contract
+- Adds, removes, or renames a dependency
+- Changes developer workflow (scripts, hooks, CI, linting rules)
+- Renames or restructures files in a way that affects imports
+
+## When NOT to Update
+
+Skip CHANGELOG.md for:
+
+- Pure formatting changes (`style: ...`, `biome format`)
+- Comment-only or whitespace edits
+- Adding/updating `.md` files inside `docs/` (those are docs, not changelog entries)
+- Bumping patch versions of devDependencies with no behaviour change
+
+## Format
+
+Add entries under `## [Unreleased]` at the top of CHANGELOG.md.
+Use these headings (only include the ones you need):
+
+```markdown
+## [Unreleased]
+
+### Added
+- `ComponentName`: short description of what was added
+
+### Changed
+- `module/file`: short description of what changed and why
+
+### Fixed
+- short description of the bug and what was corrected
+
+### Removed
+- what was deleted and why
+```
+
+Keep each entry to **one line**. Start with the file, module, or feature area as a
+backtick label when it makes the entry clearer.
+
+## Checklist Before Committing
+
+1. Code change is complete and tests pass.
+2. CHANGELOG.md has an entry under `## [Unreleased]`.
+3. The entry accurately describes the change (not just copies the commit message).
+4. Both the code files and CHANGELOG.md are included in the same commit.
