@@ -1,12 +1,14 @@
-import { type NextRequest } from "next/server";
-import { getOpenAIClient, getModelName, isReasoningModel } from "@/lib/llm/client";
+import { after, type NextRequest } from "next/server";
+import { getModelName, isReasoningModel } from "@/lib/llm/client";
 import { getInstructorClient } from "@/lib/llm/instructor";
+import { getTracedOpenAIClient } from "@/lib/llm/observability";
 import { validateRationaleRequest, normalizeRationaleResponse } from "@/lib/llm/guardrails";
 import { formatForLLM } from "@/lib/llm/formatters";
 import { assertFitsContext } from "@/lib/llm/tokens";
-import { traceLLMCall } from "@/lib/llm/langfuse";
 import { SYSTEM_PROMPT, PROMPT_VERSION } from "@/lib/llm/prompts/rationale";
 import { RationaleResponseSchema } from "@/lib/llm/schemas";
+import { langfuseSpanProcessor } from "@/instrumentation";
+import { captureServerError } from "@/lib/rollbar";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,33 +28,35 @@ export async function POST(req: NextRequest) {
     let result: ReturnType<typeof RationaleResponseSchema.parse>;
     let totalTokens = 0;
 
-    await traceLLMCall(
-      { model, promptVersion: PROMPT_VERSION, messages, output: "", tokensUsed: 0 },
-      async () => {
-        if (isReasoningModel(model)) {
-          // o-series models don't support JSON mode — parse + validate manually with Zod
-          const openai = getOpenAIClient();
-          const completion = await openai.chat.completions.create({ model, messages });
-          const raw = completion.choices[0]?.message?.content ?? "";
-          totalTokens = completion.usage?.total_tokens ?? 0;
-          result = RationaleResponseSchema.parse(JSON.parse(raw));
-          return raw;
-        }
+    if (isReasoningModel(model)) {
+      // o-series models don't support JSON mode — parse + validate manually with Zod.
+      // The traced client automatically sends the generation to Langfuse.
+      const openai = getTracedOpenAIClient();
+      const completion = await openai.chat.completions.create({ model, messages });
+      const raw = completion.choices[0]?.message?.content ?? "";
+      totalTokens = completion.usage?.total_tokens ?? 0;
+      result = RationaleResponseSchema.parse(JSON.parse(raw));
+    } else {
+      // GPT-4o and other standard models: Instructor handles Zod validation + retries.
+      // The Instructor client wraps the traced OpenAI client, so Langfuse captures
+      // every completion including retries.
+      const instructor = getInstructorClient();
+      const completion = await instructor.chat.completions.create({
+        model,
+        messages,
+        response_model: { schema: RationaleResponseSchema, name: "PortfolioRationale" },
+        max_retries: 2,
+      });
 
-        // GPT-4o and other standard models: use Instructor for automatic retry on bad output
-        const instructor = getInstructorClient();
-        const completion = await instructor.chat.completions.create({
-          model,
-          messages,
-          response_model: { schema: RationaleResponseSchema, name: "PortfolioRationale" },
-          max_retries: 2,
-        });
+      result = completion;
+    }
 
-        result = completion;
-        // Instructor merges usage into the response — total_tokens not always exposed
-        return JSON.stringify(result);
-      },
-    );
+    // Flush pending Langfuse spans after the response is sent (serverless-safe).
+    // `after()` runs after the response is delivered, ensuring traces are not lost
+    // when the serverless function terminates.
+    after(async () => {
+      await langfuseSpanProcessor.forceFlush();
+    });
 
     const safe = normalizeRationaleResponse(result!, validated.rows);
 
@@ -64,6 +68,8 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("[POST /api/rationale]", error);
+    // Report to Rollbar when ROLLBAR_SERVER_TOKEN is configured
+    await captureServerError(error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return Response.json({ error: message }, { status: 500 });
   }
