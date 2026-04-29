@@ -170,6 +170,7 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
         resultCount={visibleRows.length}
         totalCount={rows.length}
         onExport={handleExport}
+        exportDisabled={isLoadingAi}
       />
 
       {/* Mobile cards */}

@@ -7,9 +7,11 @@ type TooltipProps = {
   children: React.ReactNode;
   /** Width of the tooltip bubble. Defaults to "w-56". */
   width?: string;
+  /** When true the tooltip bubble is never shown. */
+  disabled?: boolean;
 };
 
-export function Tooltip({ content, children, width = "w-56" }: TooltipProps) {
+export function Tooltip({ content, children, width = "w-56", disabled = false }: TooltipProps) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -23,7 +25,7 @@ export function Tooltip({ content, children, width = "w-56" }: TooltipProps) {
       >
         {children}
       </span>
-      {visible && (
+      {visible && !disabled && (
         <span
           role="tooltip"
           className={`pointer-events-none absolute bottom-full left-1/2 z-20 mb-2.5 ${width} -translate-x-1/2 rounded-xl bg-ink px-3 py-2.5 text-xs leading-5 text-white shadow-lg`}

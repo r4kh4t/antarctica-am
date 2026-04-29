@@ -1,3 +1,7 @@
+"use client";
+
+import { Tooltip } from "@/components/shared/Tooltip";
+
 type MoveFilter = "all" | "increase" | "reduce" | "hold";
 
 type SortKey =
@@ -24,6 +28,7 @@ type TableControlsProps = {
   resultCount: number;
   totalCount: number;
   onExport: () => void;
+  exportDisabled?: boolean;
 };
 
 const MOVE_OPTIONS: { value: MoveFilter; label: string }[] = [
@@ -92,6 +97,7 @@ export function TableControls({
   resultCount,
   totalCount,
   onExport,
+  exportDisabled = false,
 }: TableControlsProps) {
   const sectorOptions = [
     { value: "all", label: "All" },
@@ -163,29 +169,41 @@ export function TableControls({
               ? `${totalCount} assets`
               : `${resultCount} of ${totalCount} assets`}
           </p>
-          <button
-            type="button"
-            onClick={onExport}
-            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-primary-subtle hover:text-ink"
+          <Tooltip
+            content="AI is still thinking — export will include full rationale once complete."
+            width="w-64"
+            disabled={!exportDisabled}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+            <button
+              type="button"
+              onClick={onExport}
+              disabled={exportDisabled}
+              aria-disabled={exportDisabled}
+              className={`flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold transition-colors ${
+                exportDisabled
+                  ? "cursor-not-allowed opacity-40"
+                  : "cursor-pointer hover:bg-primary-subtle hover:text-ink text-secondary"
+              }`}
             >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Export CSV
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Export CSV
+            </button>
+          </Tooltip>
         </div>
       </div>
     </div>

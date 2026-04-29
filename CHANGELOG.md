@@ -13,6 +13,8 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ### Added
 - **Export CSV** (`#16`): "Export CSV" button in `TableControls` downloads the current filtered/sorted table as a `.csv` file — ticker, name, asset ID, sector, region, weights, move, score, and rationale (AI or algo). No extra dependencies; uses native `Blob` + `URL.createObjectURL`. Utility lives in `src/lib/export.ts`.
+- **Export CSV disabled state**: button is disabled while AI rationale is loading; hovering shows a tooltip "AI is still thinking — export will include full rationale once complete."
+- `Tooltip`: added `disabled` prop to suppress the bubble without removing the wrapper.
 - **Security headers** (`#24`): `next.config.ts` now ships `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security`, and a `Content-Security-Policy` on every route. CSP allows Vercel Analytics/Speed Insights, Rollbar, Langfuse, and OpenAI; all other origins are blocked by default.
 - **release-please** (`#25`): `.github/workflows/release-please.yml` and `release-please-config.json` automate Release PRs and GitHub Releases on every merge to `main`. Parses Conventional Commits to update `CHANGELOG.md` and bump `package.json` automatically.
 
