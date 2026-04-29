@@ -41,6 +41,12 @@ vi.mock("@/lib/llm/instructor", () => ({
   }),
 }));
 
+vi.mock("@/lib/llm/cache", () => ({
+  buildRationaleCacheKey: vi.fn(() => "test-cache-key"),
+  getCachedRationale: vi.fn(() => null),
+  setCachedRationale: vi.fn(),
+}));
+
 // ── Fixtures ───────────────────────────────────────────────────────────────────
 
 const validRow = (assetId: string, current: number, recommended: number) => ({
