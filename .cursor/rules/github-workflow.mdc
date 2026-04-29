@@ -18,11 +18,11 @@ Open one before starting any `feat`, `fix`, or `refactor` work:
 ```bash
 # Feature
 gh issue create --title "feat: <short description>" --label "feature" \
-  --milestone "v1.5.0 — Next"
+  --milestone "v1.6.0 — Next"
 
 # Bug
 gh issue create --title "fix: <short description>" --label "bug" \
-  --milestone "v1.5.0 — Next"
+  --milestone "v1.6.0 — Next"
 ```
 
 ### Labels
@@ -41,7 +41,7 @@ gh issue create --title "fix: <short description>" --label "bug" \
 |---|---|---|
 | `v0.8.0 — Initial Delivery` | closed | All delivered take-home features |
 | `v0.9.0 — Refinement` | closed | Earlier post-submission improvements (complete) |
-| `v1.5.0 — Next` | open | Current backlog — new issues default here |
+| `v1.6.0 — Next` | open | Current backlog — new issues default here |
 
 ## Commit Message Linkage
 

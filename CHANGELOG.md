@@ -16,19 +16,20 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 * **ui:** richer Decision summary, portal tooltips with border ([e693323](https://github.com/r4kh4t/antarctica-am-draft/commit/e693323a141ac51dbdd020cb3c57a86464e4da91))
 
+## [1.5.1] — 2026-04-30
+
+### Changed
+
+- `PortfolioDashboard`: Decision summary uses a **two-column** compact grid (`grid-cols-2`), smaller type, tighter padding (`p-5`), and `min-w-0` / `truncate` so long benchmark names layout cleanly.
+- GitHub: open milestone retitled from `v1.5.0 — Next` to **`v1.6.0 — Next`** (backlog issues on that milestone).
+- `.cursor/rules/github-workflow.mdc`: milestone table and `gh issue create` examples now use `v1.6.0 — Next`.
+
 ## [1.4.1] — 2026-04-30
 
 ### Changed
 
 - `PortfolioDashboard`: Decision summary adds excess vs benchmark, annualised volatility, turnover, benchmark level with index name, and count of names with material weight changes.
 - `Tooltip`: bubble renders in a `document.body` portal with `position: fixed` so it is not clipped by `overflow-hidden` parents; added `ring-1 ring-primary/45`; repositions on scroll/resize.
-
-## [Unreleased]
-
-### Changed
-
-- GitHub: open milestone retitled from `v1.3.0 — Next` to **`v1.5.0 — Next`** (all open backlog issues on that milestone).
-- `.cursor/rules/github-workflow.mdc`: milestone table and `gh issue create` examples now use `v1.5.0 — Next`.
 
 ## [1.4.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.3.0...antarctica-portfolio-recommendation-v1.4.0) (2026-04-29)
 

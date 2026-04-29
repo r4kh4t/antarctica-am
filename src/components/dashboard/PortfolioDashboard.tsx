@@ -122,61 +122,69 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
               stakeholder debrief rather than hidden behind a black-box optimiser.
             </p>
           </div>
-          <div className="rounded-3xl bg-primary/12 p-6 ring-1 ring-primary/30">
-            <p className="text-sm font-semibold uppercase tracking-label text-primary">
+          <div className="rounded-3xl bg-primary/12 p-5 ring-1 ring-primary/30 lg:min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-label text-primary">
               Decision summary
             </p>
-            <dl className="mt-5 space-y-4">
-              <div>
-                <dt className="text-sm text-white/70">Expected monthly return</dt>
-                <dd className="mt-1 text-3xl font-semibold">
+            <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-5">
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">Expected monthly return</dt>
+                <dd className="mt-0.5 text-xl font-semibold tabular-nums leading-tight sm:text-2xl">
                   {formatPercent(recommendation.summary.expectedMonthlyReturn, 2)}
                 </dd>
               </div>
-              <div>
-                <dt className="text-sm text-white/70">Monthly uplift vs current portfolio</dt>
-                <dd className="mt-1 text-2xl font-semibold">{formatPercent(monthlyLift, 2)}</dd>
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">Monthly uplift vs current</dt>
+                <dd className="mt-0.5 text-lg font-semibold tabular-nums leading-tight">
+                  {formatPercent(monthlyLift, 2)}
+                </dd>
               </div>
-              <div>
-                <dt className="text-sm text-white/70">Excess vs benchmark (monthly)</dt>
-                <dd className="mt-1 text-xl font-semibold tabular-nums">
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">Excess vs benchmark (monthly)</dt>
+                <dd className="mt-0.5 text-base font-semibold tabular-nums leading-tight">
                   {formatPercent(vsBenchmarkMonthly, 2)}
                 </dd>
-                <dd className="mt-0.5 text-xs text-white/55">
-                  Expected portfolio minus benchmark average return
+                <dd className="mt-0.5 text-xs leading-snug text-white/50">
+                  Portfolio expected minus benchmark average
                 </dd>
               </div>
-              <div>
-                <dt className="text-sm text-white/70">Annualised volatility proxy</dt>
-                <dd className="mt-1 text-xl font-semibold tabular-nums">
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">Annualised volatility proxy</dt>
+                <dd className="mt-0.5 text-base font-semibold tabular-nums leading-tight">
                   {formatPercent(recommendation.summary.expectedAnnualizedVolatility)}
                 </dd>
               </div>
-              <div>
-                <dt className="text-sm text-white/70">One-way turnover</dt>
-                <dd className="mt-1 text-xl font-semibold tabular-nums">
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">One-way turnover</dt>
+                <dd className="mt-0.5 text-base font-semibold tabular-nums leading-tight">
                   {formatPercent(recommendation.summary.turnover)}
                 </dd>
               </div>
-              <div>
-                <dt className="text-sm text-white/70">Benchmark (avg monthly)</dt>
-                <dd className="mt-1 text-xl font-semibold tabular-nums">
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">Benchmark (avg monthly)</dt>
+                <dd className="mt-0.5 text-base font-semibold tabular-nums leading-tight">
                   {formatPercent(recommendation.summary.benchmarkAverageMonthlyReturn, 2)}
                 </dd>
-                <dd className="mt-0.5 text-xs text-white/55">{recommendation.benchmarkName}</dd>
+                <dd
+                  className="mt-0.5 truncate text-xs text-white/50"
+                  title={recommendation.benchmarkName}
+                >
+                  {recommendation.benchmarkName}
+                </dd>
               </div>
-              <div>
-                <dt className="text-sm text-white/70">Names with material weight change</dt>
-                <dd className="mt-1 text-xl font-semibold tabular-nums">
-                  {materialRebalanceCount}{" "}
-                  <span className="text-base font-normal text-white/60">
-                    of {recommendation.rows.length}
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">Material weight changes</dt>
+                <dd className="mt-0.5 text-base font-semibold tabular-nums leading-tight">
+                  {materialRebalanceCount}
+                  <span className="text-sm font-normal text-white/55">
+                    {" "}
+                    / {recommendation.rows.length}
                   </span>
                 </dd>
               </div>
-              <div>
-                <dt className="text-sm text-white/70">Constraint status</dt>
-                <dd className="mt-1 text-lg font-semibold">
+              <div className="min-w-0">
+                <dt className="text-xs text-white/65">Constraint status</dt>
+                <dd className="mt-0.5 text-base font-semibold leading-snug">
                   {recommendation.summary.constraintStatus}
                 </dd>
               </div>
