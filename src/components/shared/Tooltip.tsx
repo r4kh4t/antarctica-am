@@ -26,11 +26,11 @@ export function Tooltip({ content, children, width = "w-56" }: TooltipProps) {
       {visible && (
         <span
           role="tooltip"
-          className={`pointer-events-none absolute bottom-full left-1/2 z-20 mb-2.5 ${width} -translate-x-1/2 rounded-xl bg-[var(--antarctica-ink)] px-3 py-2.5 text-xs leading-5 text-white shadow-lg`}
+          className={`pointer-events-none absolute bottom-full left-1/2 z-20 mb-2.5 ${width} -translate-x-1/2 rounded-xl bg-(--antarctica-ink) px-3 py-2.5 text-xs leading-5 text-white shadow-lg`}
         >
           {content}
           {/* Arrow */}
-          <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-[var(--antarctica-ink)]" />
+          <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-(--antarctica-ink)" />
         </span>
       )}
     </span>

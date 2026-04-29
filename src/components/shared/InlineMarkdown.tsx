@@ -9,7 +9,7 @@ export function InlineMarkdown({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         i % 2 === 1 ? (
-          <strong key={i} className="font-semibold text-[var(--antarctica-ink)]">
+          <strong key={i} className="font-semibold text-(--antarctica-ink)">
             {part}
           </strong>
         ) : (

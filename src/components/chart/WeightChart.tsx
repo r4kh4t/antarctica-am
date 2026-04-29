@@ -12,7 +12,7 @@ const WeightChartContent = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full items-center justify-center rounded-2xl bg-[var(--antarctica-ice-light)] text-sm text-[var(--antarctica-charcoal)]/65">
+      <div className="flex h-full items-center justify-center rounded-2xl bg-(--antarctica-ice-light) text-sm text-(--antarctica-charcoal)/65">
         Loading allocation chart...
       </div>
     ),
@@ -21,12 +21,12 @@ const WeightChartContent = dynamic(
 
 export function WeightChart({ rows }: WeightChartProps) {
   return (
-    <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-[var(--antarctica-line)]">
+    <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-(--antarctica-line)">
       <div className="mb-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--antarctica-charcoal)]">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--antarctica-charcoal)">
           Allocation
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-[var(--antarctica-ink)]">
+        <h2 className="mt-2 text-2xl font-semibold text-(--antarctica-ink)">
           Current vs recommended weights
         </h2>
       </div>

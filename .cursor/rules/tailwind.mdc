@@ -1,0 +1,51 @@
+---
+description: Tailwind CSS v4 conventions for this project
+globs: ["src/**/*.tsx", "src/**/*.ts", "src/**/*.css"]
+alwaysApply: true
+---
+
+# Tailwind CSS v4 Conventions
+
+## CSS Variable Shorthand
+
+Tailwind v4 introduced a shorter syntax for referencing CSS custom properties.
+Always use the shorthand form — never the legacy `[var(...)]` form:
+
+```
+# Wrong (Tailwind v3 style)
+bg-[var(--antarctica-ink)]
+text-[var(--antarctica-charcoal)]/40
+
+# Correct (Tailwind v4 style)
+bg-(--antarctica-ink)
+text-(--antarctica-charcoal)/40
+```
+
+The pattern applies to **any** utility prefix: `bg-`, `text-`, `ring-`, `border-`,
+`fill-`, `stroke-`, `shadow-`, `from-`, `via-`, `to-`, `accent-`, `caret-`, etc.
+
+## Arbitrary Values vs Shorthand
+
+| Scenario | Use |
+|---|---|
+| CSS variable | `bg-(--my-var)` |
+| Arbitrary fixed value | `bg-[#1a2b3c]` or `bg-[24px]` |
+| Arbitrary value with opacity | `bg-(--my-var)/50` |
+
+## Responsive and State Variants
+
+Variants compose normally with the shorthand:
+
+```tsx
+className="hover:text-(--antarctica-ice) lg:bg-(--antarctica-ink)"
+```
+
+## Project CSS Variables
+
+All brand tokens are defined in `src/app/globals.css` under `:root`:
+
+- `--antarctica-ink` — primary dark navy
+- `--antarctica-ice` — brand teal/blue
+- `--antarctica-ice-light` — lighter teal for progress track backgrounds
+- `--antarctica-charcoal` — secondary text
+- `--antarctica-line` — subtle border/ring colour

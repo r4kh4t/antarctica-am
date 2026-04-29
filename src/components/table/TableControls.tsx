@@ -54,7 +54,7 @@ function PillGroup<T extends string>({
 }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--antarctica-charcoal)]/60">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-(--antarctica-charcoal)/60">
         {label}
       </p>
       <div className="flex flex-wrap gap-1.5">
@@ -65,8 +65,8 @@ function PillGroup<T extends string>({
             onClick={() => onChange(option.value)}
             className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
               value === option.value
-                ? "bg-[var(--antarctica-ink)] text-white"
-                : "bg-[var(--antarctica-stone)] text-[var(--antarctica-charcoal)] hover:bg-[var(--antarctica-ice-muted)]"
+                ? "bg-(--antarctica-ink) text-white"
+                : "bg-(--antarctica-stone) text-(--antarctica-charcoal) hover:bg-(--antarctica-ice-muted)"
             }`}
           >
             {option.label}
@@ -97,10 +97,10 @@ export function TableControls({
   ];
 
   return (
-    <div className="border-b border-[var(--antarctica-line)] bg-[var(--antarctica-stone)]/60">
+    <div className="border-b border-(--antarctica-line) bg-(--antarctica-stone)/60">
       <div className="grid gap-5 p-5 md:grid-cols-[1.4fr_1fr_1fr] md:p-6">
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--antarctica-charcoal)]/60">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-(--antarctica-charcoal)/60">
             Search
           </p>
           <input
@@ -108,7 +108,7 @@ export function TableControls({
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
             placeholder="Asset, sector, rationale…"
-            className="w-full rounded-2xl border border-[var(--antarctica-line)] bg-white px-4 py-2.5 text-sm text-[var(--antarctica-ink)] outline-none transition focus:border-[var(--antarctica-ice)] focus:ring-2 focus:ring-[var(--antarctica-ice)]/40"
+            className="w-full rounded-2xl border border-(--antarctica-line) bg-white px-4 py-2.5 text-sm text-(--antarctica-ink) outline-none transition focus:border-(--antarctica-ice) focus:ring-2 focus:ring-(--antarctica-ice)/40"
           />
         </div>
 
@@ -127,9 +127,9 @@ export function TableControls({
         />
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--antarctica-line)]/60 px-5 py-3 md:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-t border-(--antarctica-line)/60 px-5 py-3 md:px-6">
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--antarctica-charcoal)]/60">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-(--antarctica-charcoal)/60">
             Sort by
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -142,8 +142,8 @@ export function TableControls({
                   onClick={() => onSortChange(option.value)}
                   className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
                     isActive
-                      ? "bg-[var(--antarctica-ice)] text-[var(--antarctica-ink)]"
-                      : "bg-[var(--antarctica-stone)] text-[var(--antarctica-charcoal)] hover:bg-[var(--antarctica-ice-muted)]"
+                      ? "bg-(--antarctica-ice) text-(--antarctica-ink)"
+                      : "bg-(--antarctica-stone) text-(--antarctica-charcoal) hover:bg-(--antarctica-ice-muted)"
                   }`}
                   aria-pressed={isActive}
                 >
@@ -155,7 +155,7 @@ export function TableControls({
           </div>
         </div>
 
-        <p className="text-xs text-[var(--antarctica-charcoal)]/60">
+        <p className="text-xs text-(--antarctica-charcoal)/60">
           {resultCount === totalCount
             ? `${totalCount} assets`
             : `${resultCount} of ${totalCount} assets`}
