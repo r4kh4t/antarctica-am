@@ -8,7 +8,9 @@ A small production-minded Next.js application that reads portfolio data, calcula
 
 ## Live Deployment
 
-Vercel URL: pending deployment.
+Vercel URL: [https://antarctica-am-draft.vercel.app](https://antarctica-am-draft.vercel.app)
+
+The project is deployed under the `own-x-startup` Vercel team and is connected to the private GitHub repository. Vercel reports SSO deployment protection enabled for generated deployment URLs and Git fork protection enabled.
 
 ## Quick Start
 
