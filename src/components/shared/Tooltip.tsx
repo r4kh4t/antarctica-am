@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
+const TOOLTIP_GAP_PX = 10;
 
 type TooltipProps = {
   content: string;
@@ -12,30 +15,79 @@ type TooltipProps = {
 };
 
 export function Tooltip({ content, children, width = "w-56", disabled = false }: TooltipProps) {
+  const triggerRef = useRef<HTMLSpanElement>(null);
   const [visible, setVisible] = useState(false);
+  const [coords, setCoords] = useState<{ left: number; top: number } | null>(null);
+
+  const updatePosition = useCallback(() => {
+    const el = triggerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setCoords({
+      left: r.left + r.width / 2,
+      top: r.top - TOOLTIP_GAP_PX,
+    });
+  }, []);
+
+  const show = useCallback(() => {
+    if (disabled) return;
+    updatePosition();
+    setVisible(true);
+  }, [disabled, updatePosition]);
+
+  const hide = useCallback(() => {
+    setVisible(false);
+    setCoords(null);
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    updatePosition();
+    const onScrollOrResize = () => updatePosition();
+    window.addEventListener("scroll", onScrollOrResize, true);
+    window.addEventListener("resize", onScrollOrResize);
+    return () => {
+      window.removeEventListener("scroll", onScrollOrResize, true);
+      window.removeEventListener("resize", onScrollOrResize);
+    };
+  }, [visible, updatePosition]);
+
+  const bubble =
+    typeof document !== "undefined" &&
+    visible &&
+    !disabled &&
+    coords &&
+    createPortal(
+      <span
+        role="tooltip"
+        className={`pointer-events-none relative z-60 ${width} rounded-xl bg-ink px-3 py-2.5 text-xs leading-5 text-white shadow-lg ring-1 ring-primary/45`}
+        style={{
+          position: "fixed",
+          left: coords.left,
+          top: coords.top,
+          transform: "translate(-50%, -100%)",
+        }}
+      >
+        {content}
+        <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-ink" />
+      </span>,
+      document.body,
+    );
 
   return (
-    <span className="group relative inline-flex items-center">
+    <>
       <span
-        onMouseEnter={() => setVisible(true)}
-        onMouseLeave={() => setVisible(false)}
-        onFocus={() => setVisible(true)}
-        onBlur={() => setVisible(false)}
-        className="inline-flex cursor-help"
+        ref={triggerRef}
+        className="relative inline-flex items-center"
+        onMouseEnter={show}
+        onMouseLeave={hide}
+        onFocus={show}
+        onBlur={hide}
       >
-        {children}
+        <span className="inline-flex cursor-help">{children}</span>
       </span>
-      {visible && !disabled && (
-        <span
-          role="tooltip"
-          className={`pointer-events-none absolute bottom-full left-1/2 z-20 mb-2.5 ${width} -translate-x-1/2 rounded-xl bg-ink px-3 py-2.5 text-xs leading-5 text-white shadow-lg`}
-        >
-          {content}
-          {/* Arrow */}
-          <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-ink" />
-        </span>
-      )}
-    </span>
+      {bubble}
+    </>
   );
 }
 

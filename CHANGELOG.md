@@ -9,6 +9,13 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.4.1] — 2026-04-30
+
+### Changed
+
+- `PortfolioDashboard`: Decision summary adds excess vs benchmark, annualised volatility, turnover, benchmark level with index name, and count of names with material weight changes.
+- `Tooltip`: bubble renders in a `document.body` portal with `position: fixed` so it is not clipped by `overflow-hidden` parents; added `ring-1 ring-primary/45`; repositions on scroll/resize.
+
 ## [Unreleased]
 
 ### Changed

@@ -83,6 +83,14 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
     recommendation.summary.expectedMonthlyReturn -
     recommendation.summary.currentExpectedMonthlyReturn;
 
+  const vsBenchmarkMonthly =
+    recommendation.summary.expectedMonthlyReturn -
+    recommendation.summary.benchmarkAverageMonthlyReturn;
+
+  const materialRebalanceCount = recommendation.rows.filter(
+    (r) => Math.abs(r.weightDelta) >= 0.005,
+  ).length;
+
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
       <header className="overflow-hidden rounded-4xl bg-ink shadow-sm">
@@ -118,7 +126,7 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
             <p className="text-sm font-semibold uppercase tracking-label text-primary">
               Decision summary
             </p>
-            <dl className="mt-5 space-y-5">
+            <dl className="mt-5 space-y-4">
               <div>
                 <dt className="text-sm text-white/70">Expected monthly return</dt>
                 <dd className="mt-1 text-3xl font-semibold">
@@ -128,6 +136,43 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
               <div>
                 <dt className="text-sm text-white/70">Monthly uplift vs current portfolio</dt>
                 <dd className="mt-1 text-2xl font-semibold">{formatPercent(monthlyLift, 2)}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-white/70">Excess vs benchmark (monthly)</dt>
+                <dd className="mt-1 text-xl font-semibold tabular-nums">
+                  {formatPercent(vsBenchmarkMonthly, 2)}
+                </dd>
+                <dd className="mt-0.5 text-xs text-white/55">
+                  Expected portfolio minus benchmark average return
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm text-white/70">Annualised volatility proxy</dt>
+                <dd className="mt-1 text-xl font-semibold tabular-nums">
+                  {formatPercent(recommendation.summary.expectedAnnualizedVolatility)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm text-white/70">One-way turnover</dt>
+                <dd className="mt-1 text-xl font-semibold tabular-nums">
+                  {formatPercent(recommendation.summary.turnover)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm text-white/70">Benchmark (avg monthly)</dt>
+                <dd className="mt-1 text-xl font-semibold tabular-nums">
+                  {formatPercent(recommendation.summary.benchmarkAverageMonthlyReturn, 2)}
+                </dd>
+                <dd className="mt-0.5 text-xs text-white/55">{recommendation.benchmarkName}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-white/70">Names with material weight change</dt>
+                <dd className="mt-1 text-xl font-semibold tabular-nums">
+                  {materialRebalanceCount}{" "}
+                  <span className="text-base font-normal text-white/60">
+                    of {recommendation.rows.length}
+                  </span>
+                </dd>
               </div>
               <div>
                 <dt className="text-sm text-white/70">Constraint status</dt>
