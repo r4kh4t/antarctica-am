@@ -9,6 +9,13 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- GitHub: open milestone retitled from `v1.3.0 — Next` to **`v1.5.0 — Next`** (all open backlog issues on that milestone).
+- `.cursor/rules/github-workflow.mdc`: milestone table and `gh issue create` examples now use `v1.5.0 — Next`.
+
 ## [1.4.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.3.0...antarctica-portfolio-recommendation-v1.4.0) (2026-04-29)
 
 
