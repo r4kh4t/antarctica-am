@@ -9,6 +9,62 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.6.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.5.1...antarctica-portfolio-recommendation-v1.6.0) (2026-04-29)
+
+
+### Features
+
+* add Biome, Instructor+Zod structured outputs, and 38 unit tests ([3b85d0f](https://github.com/r4kh4t/antarctica-am-draft/commit/3b85d0fc3bd3ee3ba9e022b23d206461db061975))
+* add GPT rationale generation, pill filters, skeleton loading, component grouping ([3aa8ef0](https://github.com/r4kh4t/antarctica-am-draft/commit/3aa8ef00e17a6ce7c4430b70cca4c6f7001a81e2))
+* add recommendation table controls ([3f86ff4](https://github.com/r4kh4t/antarctica-am-draft/commit/3f86ff472bf8a508784007c26f48c55af3049a24))
+* analytics charts — performance line, risk-return scatter, sector bar ([d06ec40](https://github.com/r4kh4t/antarctica-am-draft/commit/d06ec40e15dc63c9d04407eea857a466192a0bf6))
+* **analytics:** add Vercel Web Analytics and Speed Insights ([35aa998](https://github.com/r4kh4t/antarctica-am-draft/commit/35aa998ab77cb33792a8585df65bddfc2070372d))
+* build portfolio recommendation app ([74d7784](https://github.com/r4kh4t/antarctica-am-draft/commit/74d778497196a59089c04ba85e0c4ef89c5fa52b))
+* CSV export, security headers, release-please ([#16](https://github.com/r4kh4t/antarctica-am-draft/issues/16) [#24](https://github.com/r4kh4t/antarctica-am-draft/issues/24) [#25](https://github.com/r4kh4t/antarctica-am-draft/issues/25)) ([926715e](https://github.com/r4kh4t/antarctica-am-draft/commit/926715e4850cfd63feb8e3633b746bd28715c240))
+* disable Export CSV while AI is loading, add tooltip ([54d25ad](https://github.com/r4kh4t/antarctica-am-draft/commit/54d25adf55da8e74544bcc59b375d51a6ea6a386))
+* in-process rationale cache with 1-hour TTL ([5ede21c](https://github.com/r4kh4t/antarctica-am-draft/commit/5ede21cf42fde41175afb3ec87654ca54b6be93b))
+* in-process rationale cache with 1-hour TTL ([#18](https://github.com/r4kh4t/antarctica-am-draft/issues/18)) ([38b28fc](https://github.com/r4kh4t/antarctica-am-draft/commit/38b28fcbc9cba7178ece8da6fbedd34143f86008))
+* **monitoring:** add Rollbar error tracking (client + server) ([ef66507](https://github.com/r4kh4t/antarctica-am-draft/commit/ef665073adf15357afd0f0ed695c62982f0492f3))
+* **observability:** replace manual Langfuse tracing with observeOpenAI integration ([004a370](https://github.com/r4kh4t/antarctica-am-draft/commit/004a370efed8e83d8f3a15f282ce6c87ff47fb1a))
+* rationale cache, route tests, Vitest alias fix ([#18](https://github.com/r4kh4t/antarctica-am-draft/issues/18) [#21](https://github.com/r4kh4t/antarctica-am-draft/issues/21)) ([658a61e](https://github.com/r4kh4t/antarctica-am-draft/commit/658a61e2faab366aaf04d439b38d97907cb13ae2))
+* render backtick spans as bold in rationale and narrative text ([0db451e](https://github.com/r4kh4t/antarctica-am-draft/commit/0db451ee18b13ddb1e8d35d50ffef75a79c063b1))
+* **ui:** compact two-column Decision summary (v1.5.1); milestone v1.6.0 ([fcb88ad](https://github.com/r4kh4t/antarctica-am-draft/commit/fcb88ada33e2595428d338f6904e6a5f1f1d7a53))
+* **ui:** richer Decision summary, portal tooltips with border ([e693323](https://github.com/r4kh4t/antarctica-am-draft/commit/e693323a141ac51dbdd020cb3c57a86464e4da91))
+
+
+### Bug Fixes
+
+* **chart:** replace next/dynamic with a regular import in WeightChart ([4fd0ed1](https://github.com/r4kh4t/antarctica-am-draft/commit/4fd0ed16c7d76a2848a06958dc68e12db9f1c21c))
+* **chart:** resolve TS language server module error in WeightChart dynamic import ([eb8c242](https://github.com/r4kh4t/antarctica-am-draft/commit/eb8c2420b8b99cd62930eadb63b334c0791a5bff))
+* correct assetId key mapping, add algo-rationale icon, sector insight tooltips ([76b66bc](https://github.com/r4kh4t/antarctica-am-draft/commit/76b66bc308c0ffac8433acbd032d1054e37770f3))
+* improve recommendation table responsiveness ([25858e7](https://github.com/r4kh4t/antarctica-am-draft/commit/25858e7a727963d464653484a56006e38ac73fec))
+* normalise import path and prompt en-dashes ([c18ed41](https://github.com/r4kh4t/antarctica-am-draft/commit/c18ed41c28c70c113000d7debc96417ad5ec975d))
+* remove isFront prop from ReferenceLine in SectorChart ([df2021e](https://github.com/r4kh4t/antarctica-am-draft/commit/df2021e76984be7ce426e5c52fe59ed24588b789))
+* resolve lint warnings in schema tests ([aaf012f](https://github.com/r4kh4t/antarctica-am-draft/commit/aaf012fe5f3b2ed8dee503f18f18268885048579))
+* **security:** force postcss &gt;=8.5.10 via npm overrides (Dependabot [#1](https://github.com/r4kh4t/antarctica-am-draft/issues/1)) ([ef37e9b](https://github.com/r4kh4t/antarctica-am-draft/commit/ef37e9b9ff0c8a72f71463247b255240eec1fa4e))
+* **tests:** resolve two tsc type errors in LLM test files ([357e1d4](https://github.com/r4kh4t/antarctica-am-draft/commit/357e1d4d9c982a1bbf02ee818084d2cbe85e92f5))
+* **test:** Vitest alias portability, route integration tests, ValidationError 400 ([28c8035](https://github.com/r4kh4t/antarctica-am-draft/commit/28c80352b26cdf1c731a2803800c4bc5ce81061b))
+
+
+### Code Refactoring
+
+* **design-tokens:** replace antarctica-* vars with semantic [@theme](https://github.com/theme) tokens ([6bdd26f](https://github.com/r4kh4t/antarctica-am-draft/commit/6bdd26f0ac625c5d6b3e3ea31a0b6f52ee991cf5))
+* extract AI_STATUS, AiState, and API_ROUTES into src/lib/constants.ts ([74656fb](https://github.com/r4kh4t/antarctica-am-draft/commit/74656fb58c1cc05e2da2443531f2e4b5fd4b4051))
+
+
+### Tests
+
+* integration tests for POST /api/rationale ([59b7c68](https://github.com/r4kh4t/antarctica-am-draft/commit/59b7c684f7f540a7dff23e7605471f2b449c7f4a))
+* integration tests for POST /api/rationale ([#21](https://github.com/r4kh4t/antarctica-am-draft/issues/21)) ([359c8c3](https://github.com/r4kh4t/antarctica-am-draft/commit/359c8c3b92826dd5f17c94d3877504f8db43cd5c))
+
+
+### CI / Tooling
+
+* add commit-msg + pre-push hooks and GitHub Actions CI workflow ([175b1b1](https://github.com/r4kh4t/antarctica-am-draft/commit/175b1b1f61ab50d91661c5a5fefe1404763bbcb8))
+* add Dependabot weekly updates for npm and GitHub Actions ([#9](https://github.com/r4kh4t/antarctica-am-draft/issues/9)) ([d8a6bac](https://github.com/r4kh4t/antarctica-am-draft/commit/d8a6bac3cf21ad7a993289af057e16e0a7c9d9f8))
+* move release-branch-name into package config (must be package-level) ([0813dfd](https://github.com/r4kh4t/antarctica-am-draft/commit/0813dfd928818fa3b717e2b3d04f5953cb64bc88))
+* set release-please branch name to chore/release ([42a91fb](https://github.com/r4kh4t/antarctica-am-draft/commit/42a91fb18bf36cf5abbbd841d956799f2d1685d0))
+
 ## [1.5.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.4.0...antarctica-portfolio-recommendation-v1.5.0) (2026-04-29)
 
 
