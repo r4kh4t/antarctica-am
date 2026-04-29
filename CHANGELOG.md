@@ -9,6 +9,20 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.3.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.2.3...antarctica-portfolio-recommendation-v1.3.0) (2026-04-29)
+
+
+### Features
+
+* in-process rationale cache with 1-hour TTL ([5ede21c](https://github.com/r4kh4t/antarctica-am-draft/commit/5ede21cf42fde41175afb3ec87654ca54b6be93b))
+* in-process rationale cache with 1-hour TTL ([#18](https://github.com/r4kh4t/antarctica-am-draft/issues/18)) ([38b28fc](https://github.com/r4kh4t/antarctica-am-draft/commit/38b28fcbc9cba7178ece8da6fbedd34143f86008))
+
+
+### Tests
+
+* integration tests for POST /api/rationale ([59b7c68](https://github.com/r4kh4t/antarctica-am-draft/commit/59b7c684f7f540a7dff23e7605471f2b449c7f4a))
+* integration tests for POST /api/rationale ([#21](https://github.com/r4kh4t/antarctica-am-draft/issues/21)) ([359c8c3](https://github.com/r4kh4t/antarctica-am-draft/commit/359c8c3b92826dd5f17c94d3877504f8db43cd5c))
+
 ## [Unreleased]
 
 ### Added
