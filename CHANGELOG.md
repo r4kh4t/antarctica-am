@@ -49,6 +49,13 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 * add commit-msg + pre-push hooks and GitHub Actions CI workflow ([175b1b1](https://github.com/r4kh4t/antarctica-am-draft/commit/175b1b1f61ab50d91661c5a5fefe1404763bbcb8))
 * add Dependabot weekly updates for npm and GitHub Actions ([#9](https://github.com/r4kh4t/antarctica-am-draft/issues/9)) ([d8a6bac](https://github.com/r4kh4t/antarctica-am-draft/commit/d8a6bac3cf21ad7a993289af057e16e0a7c9d9f8))
 
+## [1.1.2] — 2026-04-30
+
+### Security
+- `package.json`: added `overrides.postcss >= 8.5.10` to force all transitive copies of PostCSS (including `next`'s locked `8.4.31`) to the patched version `8.5.12`. Fixes Dependabot alert #1 — PostCSS XSS via unescaped `</style>` in CSS stringify output (medium severity).
+
+---
+
 ## [1.1.1] — 2026-04-30
 
 ### Fixed
