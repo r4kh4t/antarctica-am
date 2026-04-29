@@ -26,14 +26,19 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 ## [Unreleased]
 
 ### Added
+- `src/app/api/rationale/route.test.ts`: 3 integration tests for the POST route — success (200), guardrail rejection (400 without Rollbar), and upstream OpenAI failure (500 + `captureServerError`).
 - `src/lib/llm/cache.ts`: in-process rationale cache using a module-level Map with 1-hour TTL. Exposes `buildRationaleCacheKey` (SHA-256, key-order stable), `getCachedRationale`, `setCachedRationale`, and `clearRationaleCache` (for tests).
 - `src/lib/llm/cache.test.ts`: 7 unit / integration tests — hash determinism, get/set/expiry, and a route-level test verifying OpenAI is called only once for identical payloads.
-- `vitest.config.ts`: `resolve.alias` for `@/` → `src/` (enables route integration test from any directory).
 
 ### Changed
+- `POST /api/rationale`: catches `ValidationError` from guardrails and returns HTTP 400 without calling Rollbar; upstream errors remain HTTP 500 + `captureServerError`.
+- `validateRationaleRequest` now throws `ValidationError` (exported from `guardrails.ts`).
 - `POST /api/rationale`: checks the cache before calling OpenAI; stores the response after a cache miss; returns `cached: true` in the JSON body on a hit.
 
-Closes #18
+### Fixed
+- `vitest.config.ts`: `@/` → `src/` alias uses `process.cwd()` (not `__dirname`) so Vitest resolves imports when the config runs in an ESM graph without `__dirname`.
+
+Closes #18. Closes #21.
 
 ---
 
