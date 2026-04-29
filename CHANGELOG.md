@@ -9,6 +9,18 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.4.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.3.0...antarctica-portfolio-recommendation-v1.4.0) (2026-04-29)
+
+
+### Features
+
+* rationale cache, route tests, Vitest alias fix ([#18](https://github.com/r4kh4t/antarctica-am-draft/issues/18) [#21](https://github.com/r4kh4t/antarctica-am-draft/issues/21)) ([658a61e](https://github.com/r4kh4t/antarctica-am-draft/commit/658a61e2faab366aaf04d439b38d97907cb13ae2))
+
+
+### Bug Fixes
+
+* **test:** Vitest alias portability, route integration tests, ValidationError 400 ([28c8035](https://github.com/r4kh4t/antarctica-am-draft/commit/28c80352b26cdf1c731a2803800c4bc5ce81061b))
+
 ## [1.3.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.2.3...antarctica-portfolio-recommendation-v1.3.0) (2026-04-29)
 
 
