@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { formatPercent, formatScore, formatSignedPercent } from "@/lib/portfolio/format";
+import { exportRowsToCSV } from "@/lib/export";
 import type { PortfolioRecommendation, RecommendationRow } from "@/lib/portfolio/types";
 import { AI_STATUS } from "@/lib/constants";
 import type { AiState } from "@/lib/constants";
@@ -102,6 +103,16 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
     [sortKey],
   );
 
+  const handleExport = useCallback(() => {
+    exportRowsToCSV(visibleRows, (row) => {
+      if (aiState.status === AI_STATUS.LOADED) {
+        const aiText = aiState.rationale[row.assetId];
+        if (aiText?.trim()) return aiText;
+      }
+      return row.rationale;
+    });
+  }, [visibleRows, aiState]);
+
   function sortIndicator(key: SortKey) {
     if (key !== sortKey) return "↕";
     return sortDirection === "asc" ? "↑" : "↓";
@@ -158,6 +169,7 @@ export function RecommendationTable({ recommendation, aiState }: RecommendationT
         onSortChange={handleSortChange}
         resultCount={visibleRows.length}
         totalCount={rows.length}
+        onExport={handleExport}
       />
 
       {/* Mobile cards */}

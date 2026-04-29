@@ -23,6 +23,7 @@ type TableControlsProps = {
   onSortChange: (key: SortKey) => void;
   resultCount: number;
   totalCount: number;
+  onExport: () => void;
 };
 
 const MOVE_OPTIONS: { value: MoveFilter; label: string }[] = [
@@ -90,6 +91,7 @@ export function TableControls({
   onSortChange,
   resultCount,
   totalCount,
+  onExport,
 }: TableControlsProps) {
   const sectorOptions = [
     { value: "all", label: "All" },
@@ -155,11 +157,36 @@ export function TableControls({
           </div>
         </div>
 
-        <p className="text-xs text-secondary/60">
-          {resultCount === totalCount
-            ? `${totalCount} assets`
-            : `${resultCount} of ${totalCount} assets`}
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-secondary/60">
+            {resultCount === totalCount
+              ? `${totalCount} assets`
+              : `${resultCount} of ${totalCount} assets`}
+          </p>
+          <button
+            type="button"
+            onClick={onExport}
+            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-primary-subtle hover:text-ink"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export CSV
+          </button>
+        </div>
       </div>
     </div>
   );
