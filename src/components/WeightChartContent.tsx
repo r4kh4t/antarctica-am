@@ -39,11 +39,11 @@ export function WeightChartContent({ rows }: WeightChartContentProps) {
         />
         <Tooltip
           formatter={(value) => formatPercent(Number(value))}
-          cursor={{ fill: "rgba(14, 165, 233, 0.08)" }}
+          cursor={{ fill: "rgba(183, 213, 235, 0.24)" }}
         />
         <Legend />
-        <Bar dataKey="current" name="Current" fill="#94a3b8" radius={[8, 8, 0, 0]} />
-        <Bar dataKey="recommended" name="Recommended" fill="#0369a1" radius={[8, 8, 0, 0]} />
+        <Bar dataKey="current" name="Current" fill="#1F2528" radius={[8, 8, 0, 0]} />
+        <Bar dataKey="recommended" name="Recommended" fill="#B7D5EB" radius={[8, 8, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

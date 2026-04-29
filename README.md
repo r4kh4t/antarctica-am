@@ -71,6 +71,7 @@ This is deliberately not a black-box optimiser. For a small internal fund and a 
 - [Recommendation methodology](docs/recommendation-methodology.md)
 - [Development workflow](docs/development-workflow.md)
 - [AI workflow](docs/ai-workflow.md)
+- [Brand notes](docs/brand-notes.md)
 
 ## AI Usage
 

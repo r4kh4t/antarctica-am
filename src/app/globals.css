@@ -1,15 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f8fb;
-  --foreground: #142033;
+  --antarctica-ice: #b7d5eb;
+  --antarctica-ice-light: #eef7fc;
+  --antarctica-ice-muted: #d8eaf6;
+  --antarctica-ink: #050505;
+  --antarctica-charcoal: #1f2528;
+  --antarctica-stone: #f5f3ef;
+  --antarctica-line: #d8d8d2;
+  --background: var(--antarctica-stone);
+  --foreground: var(--antarctica-ink);
 }
 
 body {
   min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    "Gotham", "Gotham SSm", "Montserrat", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 button,

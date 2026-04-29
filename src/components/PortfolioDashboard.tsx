@@ -11,10 +11,12 @@ type PortfolioDashboardProps = {
 
 function KpiCard({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-      <p className="text-sm font-medium text-slate-500">{label}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{detail}</p>
+    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-[var(--antarctica-line)]">
+      <p className="text-sm font-medium text-[var(--antarctica-charcoal)]/65">{label}</p>
+      <p className="mt-3 text-3xl font-semibold tracking-tight text-[var(--antarctica-ink)]">
+        {value}
+      </p>
+      <p className="mt-2 text-sm leading-6 text-[var(--antarctica-charcoal)]/65">{detail}</p>
     </div>
   );
 }
@@ -26,11 +28,11 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-      <header className="overflow-hidden rounded-[2rem] bg-slate-950 shadow-sm">
+      <header className="overflow-hidden rounded-[2rem] bg-[var(--antarctica-ink)] shadow-sm">
         <div className="grid gap-8 p-8 text-white lg:grid-cols-[1.1fr_0.9fr] lg:p-10">
           <div>
             <div className="flex items-center gap-4">
-              <div className="rounded-2xl bg-white p-3">
+              <div className="rounded-2xl bg-[var(--antarctica-stone)] p-3">
                 <Image
                   src="/assets/antarctica-logo.svg"
                   alt="Antarctica Asset Management"
@@ -40,38 +42,38 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
                 />
               </div>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-300">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--antarctica-ice)]">
                   Portfolio recommendation
                 </p>
-                <p className="mt-1 text-sm text-slate-300">As of {recommendation.asOf}</p>
+                <p className="mt-1 text-sm text-white/70">As of {recommendation.asOf}</p>
               </div>
             </div>
             <h1 className="mt-8 max-w-3xl text-4xl font-semibold tracking-tight lg:text-5xl">
               Tilt toward stronger risk-adjusted monthly returns while respecting soft business
               constraints.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
               {recommendation.objective} This recommendation is designed to be explainable in a
               stakeholder debrief rather than hidden behind a black-box optimiser.
             </p>
           </div>
-          <div className="rounded-3xl bg-white/10 p-6 ring-1 ring-white/15">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-300">
+          <div className="rounded-3xl bg-[var(--antarctica-ice)]/12 p-6 ring-1 ring-[var(--antarctica-ice)]/30">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--antarctica-ice)]">
               Decision summary
             </p>
             <dl className="mt-5 space-y-5">
               <div>
-                <dt className="text-sm text-slate-300">Expected monthly return</dt>
+                <dt className="text-sm text-white/70">Expected monthly return</dt>
                 <dd className="mt-1 text-3xl font-semibold">
                   {formatPercent(recommendation.summary.expectedMonthlyReturn, 2)}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm text-slate-300">Monthly uplift vs current portfolio</dt>
+                <dt className="text-sm text-white/70">Monthly uplift vs current portfolio</dt>
                 <dd className="mt-1 text-2xl font-semibold">{formatPercent(monthlyLift, 2)}</dd>
               </div>
               <div>
-                <dt className="text-sm text-slate-300">Constraint status</dt>
+                <dt className="text-sm text-white/70">Constraint status</dt>
                 <dd className="mt-1 text-lg font-semibold">
                   {recommendation.summary.constraintStatus}
                 </dd>

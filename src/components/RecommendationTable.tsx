@@ -7,16 +7,18 @@ type RecommendationTableProps = {
 
 export function RecommendationTable({ rows }: RecommendationTableProps) {
   return (
-    <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
-      <div className="border-b border-slate-200 p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-700">
+    <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-[var(--antarctica-line)]">
+      <div className="border-b border-[var(--antarctica-line)] p-6">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--antarctica-charcoal)]">
           Recommendation
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Proposed asset weights</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-[var(--antarctica-ink)]">
+          Proposed asset weights
+        </h2>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <table className="min-w-full divide-y divide-[var(--antarctica-line)] text-sm">
+          <thead className="bg-[var(--antarctica-ice-light)] text-left text-xs font-semibold uppercase tracking-wide text-[var(--antarctica-charcoal)]">
             <tr>
               <th className="px-6 py-4">Asset</th>
               <th className="px-6 py-4">Sector</th>
@@ -27,18 +29,20 @@ export function RecommendationTable({ rows }: RecommendationTableProps) {
               <th className="px-6 py-4">Rationale</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 bg-white">
+          <tbody className="divide-y divide-[var(--antarctica-line)] bg-white">
             {rows.map((row) => (
               <tr key={row.assetId} className="align-top">
                 <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-950">{row.ticker}</div>
-                  <div className="mt-1 min-w-48 text-slate-500">{row.name}</div>
+                  <div className="font-semibold text-[var(--antarctica-ink)]">{row.ticker}</div>
+                  <div className="mt-1 min-w-48 text-[var(--antarctica-charcoal)]/65">
+                    {row.name}
+                  </div>
                 </td>
-                <td className="px-6 py-4 text-slate-600">{row.sector}</td>
-                <td className="px-6 py-4 text-right font-medium text-slate-700">
+                <td className="px-6 py-4 text-[var(--antarctica-charcoal)]">{row.sector}</td>
+                <td className="px-6 py-4 text-right font-medium text-[var(--antarctica-charcoal)]">
                   {formatPercent(row.currentWeight)}
                 </td>
-                <td className="px-6 py-4 text-right font-semibold text-slate-950">
+                <td className="px-6 py-4 text-right font-semibold text-[var(--antarctica-ink)]">
                   {formatPercent(row.recommendedWeight)}
                 </td>
                 <td
@@ -48,10 +52,12 @@ export function RecommendationTable({ rows }: RecommendationTableProps) {
                 >
                   {formatSignedPercent(row.weightDelta)}
                 </td>
-                <td className="px-6 py-4 text-right text-slate-700">
+                <td className="px-6 py-4 text-right text-[var(--antarctica-charcoal)]">
                   {formatScore(row.riskAdjustedScore)}
                 </td>
-                <td className="max-w-sm px-6 py-4 leading-6 text-slate-600">{row.rationale}</td>
+                <td className="max-w-sm px-6 py-4 leading-6 text-[var(--antarctica-charcoal)]/75">
+                  {row.rationale}
+                </td>
               </tr>
             ))}
           </tbody>
