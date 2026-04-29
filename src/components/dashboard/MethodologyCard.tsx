@@ -1,11 +1,16 @@
 import { formatPercent } from "@/lib/portfolio/format";
 import type { PortfolioRecommendation } from "@/lib/portfolio/types";
+import type { AiState } from "./PortfolioDashboard";
+import { Tooltip, InfoIcon } from "@/components/shared/Tooltip";
 
 type MethodologyCardProps = {
   recommendation: PortfolioRecommendation;
+  aiState: AiState;
 };
 
-export function MethodologyCard({ recommendation }: MethodologyCardProps) {
+export function MethodologyCard({ recommendation, aiState }: MethodologyCardProps) {
+  const sectorInsights = aiState.status === "loaded" ? aiState.sectorInsights : {};
+
   return (
     <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="rounded-3xl bg-[var(--antarctica-ink)] p-6 text-white shadow-sm">
@@ -23,32 +28,45 @@ export function MethodologyCard({ recommendation }: MethodologyCardProps) {
         </ul>
       </div>
       <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-[var(--antarctica-line)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--antarctica-charcoal)]">
-          Soft constraints
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--antarctica-charcoal)]">
+            Soft constraints
+          </p>
+          {aiState.status === "loading" && (
+            <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[var(--antarctica-ice)]" />
+          )}
+        </div>
         <h2 className="mt-2 text-2xl font-semibold text-[var(--antarctica-ink)]">
           Sector exposure check
         </h2>
         <div className="mt-5 space-y-4">
-          {recommendation.sectorExposures.map((sector) => (
-            <div key={sector.sector}>
-              <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="font-semibold text-[var(--antarctica-charcoal)]">
-                  {sector.sector}
-                </span>
-                <span className="text-[var(--antarctica-charcoal)]/65">
-                  {formatPercent(sector.recommendedWeight)} target, range{" "}
-                  {formatPercent(sector.min, 0)}-{formatPercent(sector.max, 0)}
-                </span>
+          {recommendation.sectorExposures.map((sector) => {
+            const insight = sectorInsights[sector.sector];
+            return (
+              <div key={sector.sector}>
+                <div className="flex items-center justify-between gap-4 text-sm">
+                  <span className="flex items-center gap-1.5 font-semibold text-[var(--antarctica-charcoal)]">
+                    {sector.sector}
+                    {insight && (
+                      <Tooltip content={insight} width="w-64">
+                        <InfoIcon className="text-[var(--antarctica-charcoal)]/40 hover:text-[var(--antarctica-charcoal)]" />
+                      </Tooltip>
+                    )}
+                  </span>
+                  <span className="text-[var(--antarctica-charcoal)]/65">
+                    {formatPercent(sector.recommendedWeight)} target, range{" "}
+                    {formatPercent(sector.min, 0)}-{formatPercent(sector.max, 0)}
+                  </span>
+                </div>
+                <div className="mt-2 h-2 rounded-full bg-[var(--antarctica-ice-light)]">
+                  <div
+                    className="h-2 rounded-full bg-[var(--antarctica-ice)]"
+                    style={{ width: `${Math.min(sector.recommendedWeight * 100, 100)}%` }}
+                  />
+                </div>
               </div>
-              <div className="mt-2 h-2 rounded-full bg-[var(--antarctica-ice-light)]">
-                <div
-                  className="h-2 rounded-full bg-[var(--antarctica-ice)]"
-                  style={{ width: `${Math.min(sector.recommendedWeight * 100, 100)}%` }}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

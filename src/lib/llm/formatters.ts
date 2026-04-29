@@ -9,22 +9,22 @@ function score(value: number): string {
 }
 
 /**
- * Converts a portfolio recommendation request into markdown tables that give
- * an LLM rich, structured context without requiring it to parse raw JSON.
+ * Converts a portfolio recommendation request into markdown tables.
+ * The Asset ID column is critical — it must match the keys in the LLM's JSON response.
  */
 export function formatForLLM(req: RationaleRequest): string {
-  const { rows, summary, benchmarkName, asOf } = req;
+  const { rows, summary, sectorExposures, benchmarkName, asOf } = req;
 
   const sorted = [...rows].sort((a, b) => b.recommendedWeight - a.recommendedWeight);
 
   const rebalancingTable = [
     `## Proposed Rebalancing — ${asOf}`,
     "",
-    "| Asset | Ticker | Sector | Region | Current | Recommended | Change |",
-    "|-------|--------|--------|--------|--------:|------------:|-------:|",
+    "| Asset ID | Name | Ticker | Sector | Region | Current | Recommended | Change |",
+    "|----------|------|--------|--------|--------|--------:|------------:|-------:|",
     ...sorted.map(
       (r) =>
-        `| ${r.name} | **${r.ticker}** | ${r.sector} | ${r.region} | ${pct(r.currentWeight)} | ${pct(r.recommendedWeight)} | ${r.weightDelta >= 0 ? "+" : ""}${pct(r.weightDelta)} |`,
+        `| \`${r.assetId}\` | ${r.name} | **${r.ticker}** | ${r.sector} | ${r.region} | ${pct(r.currentWeight)} | ${pct(r.recommendedWeight)} | ${r.weightDelta >= 0 ? "+" : ""}${pct(r.weightDelta)} |`,
     ),
   ].join("\n");
 
@@ -32,12 +32,24 @@ export function formatForLLM(req: RationaleRequest): string {
     "",
     "## Asset Performance Metrics",
     "",
-    "| Ticker | Avg Monthly Return | Ann. Volatility | Risk-Adj Score | vs Benchmark |",
-    "|--------|-----------------:|----------------:|---------------:|-------------:|",
+    "| Asset ID | Ticker | Avg Monthly Return | Ann. Volatility | Risk-Adj Score | vs Benchmark |",
+    "|----------|--------|-----------------:|----------------:|---------------:|-------------:|",
     ...sorted.map((r) => {
       const vsBenchmark = r.averageMonthlyReturn - summary.benchmarkAverageMonthlyReturn;
-      return `| **${r.ticker}** | ${pct(r.averageMonthlyReturn)} | ${pct(r.annualizedVolatility)} | ${score(r.riskAdjustedScore)} | ${vsBenchmark >= 0 ? "+" : ""}${pct(vsBenchmark)} |`;
+      return `| \`${r.assetId}\` | **${r.ticker}** | ${pct(r.averageMonthlyReturn)} | ${pct(r.annualizedVolatility)} | ${score(r.riskAdjustedScore)} | ${vsBenchmark >= 0 ? "+" : ""}${pct(vsBenchmark)} |`;
     }),
+  ].join("\n");
+
+  const sectorsTable = [
+    "",
+    "## Sector Exposures",
+    "",
+    "| Sector | Current | Recommended | Range | Status |",
+    "|--------|--------:|------------:|-------|--------|",
+    ...sectorExposures.map(
+      (s) =>
+        `| **${s.sector}** | ${pct(s.currentWeight)} | ${pct(s.recommendedWeight)} | ${pct(s.min, 0)}–${pct(s.max, 0)} | ${s.status} |`,
+    ),
   ].join("\n");
 
   const portfolioSummary = [
@@ -52,5 +64,5 @@ export function formatForLLM(req: RationaleRequest): string {
     `| Benchmark avg monthly return (${benchmarkName}) | ${pct(summary.benchmarkAverageMonthlyReturn)} | — |`,
   ].join("\n");
 
-  return [rebalancingTable, metricsTable, portfolioSummary].join("\n");
+  return [rebalancingTable, metricsTable, sectorsTable, portfolioSummary].join("\n");
 }

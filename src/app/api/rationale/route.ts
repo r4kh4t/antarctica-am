@@ -22,24 +22,20 @@ export async function POST(req: NextRequest) {
       { role: "user" as const, content: userMessage },
     ];
 
-    // Reasoning (o-series) models don't support temperature or response_format: json_object
-    // on older API versions — use plain content + strict JSON instruction in the prompt instead.
-    const baseParams = {
-      model,
-      messages,
-    };
-
+    const baseParams = { model, messages };
     const params = isReasoningModel(model)
       ? baseParams
       : { ...baseParams, response_format: { type: "json_object" as const }, temperature: 0.2 };
 
     let rawContent = "";
+    let totalTokens = 0;
 
     await traceLLMCall(
       { model, promptVersion: PROMPT_VERSION, messages, output: "", tokensUsed: 0 },
       async () => {
         const completion = await openai.chat.completions.create(params);
         rawContent = completion.choices[0]?.message?.content ?? "";
+        totalTokens = completion.usage?.total_tokens ?? 0;
         return rawContent;
       },
     );
@@ -51,12 +47,11 @@ export async function POST(req: NextRequest) {
       ...safe,
       model,
       promptVersion: PROMPT_VERSION,
+      tokensUsed: totalTokens,
     });
   } catch (error: unknown) {
     console.error("[POST /api/rationale]", error);
-
     const message = error instanceof Error ? error.message : "Unknown error";
-
     return Response.json({ error: message }, { status: 500 });
   }
 }

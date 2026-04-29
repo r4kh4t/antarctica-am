@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { formatPercent } from "@/lib/portfolio/format";
 import type { PortfolioRecommendation } from "@/lib/portfolio/types";
 import { MethodologyCard } from "./MethodologyCard";
@@ -8,6 +11,16 @@ import { WeightChart } from "@/components/chart";
 type PortfolioDashboardProps = {
   recommendation: PortfolioRecommendation;
 };
+
+export type AiState =
+  | { status: "loading" }
+  | {
+      status: "loaded";
+      rationale: Record<string, string>;
+      narrative: string;
+      sectorInsights: Record<string, string>;
+    }
+  | { status: "error" };
 
 function KpiCard({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
@@ -22,6 +35,60 @@ function KpiCard({ label, value, detail }: { label: string; value: string; detai
 }
 
 export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) {
+  const [aiState, setAiState] = useState<AiState>({ status: "loading" });
+
+  useEffect(() => {
+    async function fetchAi() {
+      try {
+        const res = await fetch("/api/rationale", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            rows: recommendation.rows.map((r) => ({
+              assetId: r.assetId,
+              ticker: r.ticker,
+              name: r.name,
+              sector: r.sector,
+              region: r.region,
+              currentWeight: r.currentWeight,
+              recommendedWeight: r.recommendedWeight,
+              weightDelta: r.weightDelta,
+              averageMonthlyReturn: r.averageMonthlyReturn,
+              annualizedVolatility: r.annualizedVolatility,
+              riskAdjustedScore: r.riskAdjustedScore,
+              rationale: r.rationale,
+            })),
+            sectorExposures: recommendation.sectorExposures,
+            summary: {
+              expectedMonthlyReturn: recommendation.summary.expectedMonthlyReturn,
+              currentExpectedMonthlyReturn: recommendation.summary.currentExpectedMonthlyReturn,
+              expectedAnnualizedVolatility: recommendation.summary.expectedAnnualizedVolatility,
+              turnover: recommendation.summary.turnover,
+              benchmarkAverageMonthlyReturn: recommendation.summary.benchmarkAverageMonthlyReturn,
+            },
+            benchmarkName: recommendation.benchmarkName,
+            asOf: recommendation.asOf,
+          }),
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        setAiState({
+          status: "loaded",
+          rationale: data.rationale ?? {},
+          narrative: data.narrative ?? "",
+          sectorInsights: data.sectorInsights ?? {},
+        });
+      } catch (err) {
+        console.error("[PortfolioDashboard] AI fetch failed:", err);
+        setAiState({ status: "error" });
+      }
+    }
+
+    fetchAi();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const monthlyLift =
     recommendation.summary.expectedMonthlyReturn -
     recommendation.summary.currentExpectedMonthlyReturn;
@@ -111,11 +178,11 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
 
       <div className="mt-8 grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
         <WeightChart rows={recommendation.rows} />
-        <MethodologyCard recommendation={recommendation} />
+        <MethodologyCard recommendation={recommendation} aiState={aiState} />
       </div>
 
       <div className="mt-8">
-        <RecommendationTable recommendation={recommendation} />
+        <RecommendationTable recommendation={recommendation} aiState={aiState} />
       </div>
     </main>
   );
