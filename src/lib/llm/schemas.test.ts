@@ -31,7 +31,8 @@ describe("RationaleResponseSchema", () => {
   });
 
   it("rejects a response with a missing rationale field", () => {
-    const { rationale: _, ...noRationale } = VALID_RESPONSE;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { rationale: _r, ...noRationale } = VALID_RESPONSE;
     const result = RationaleResponseSchema.safeParse(noRationale);
     expect(result.success).toBe(false);
   });
@@ -46,13 +47,15 @@ describe("RationaleResponseSchema", () => {
   });
 
   it("accepts a response without sectorInsights (optional field)", () => {
-    const { sectorInsights: _, ...noSectors } = VALID_RESPONSE;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { sectorInsights: _si, ...noSectors } = VALID_RESPONSE;
     const result = RationaleResponseSchema.safeParse(noSectors);
     expect(result.success).toBe(true);
   });
 
   it("defaults sectorInsights to an empty object when omitted", () => {
-    const { sectorInsights: _, ...noSectors } = VALID_RESPONSE;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { sectorInsights: _si, ...noSectors } = VALID_RESPONSE;
     const result = RationaleResponseSchema.parse(noSectors);
     expect(result.sectorInsights).toEqual({});
   });
@@ -74,12 +77,9 @@ describe("RationaleResponseSchema", () => {
 
   it("infers the correct TypeScript type", () => {
     const result = RationaleResponseSchema.parse(VALID_RESPONSE);
-    // These property accesses confirm the inferred shape at compile time
-    const narrative: string = result.narrative;
-    const rationale: Record<string, string> = result.rationale;
-    const sectorInsights: Record<string, string> = result.sectorInsights;
-    expect(narrative).toBeTruthy();
-    expect(rationale).toBeDefined();
-    expect(sectorInsights).toBeDefined();
+    // Type assertions at compile time — the assignments below will error if types are wrong
+    expect(typeof result.narrative satisfies "string").toBe("string");
+    expect(typeof result.rationale satisfies "object").toBe("object");
+    expect(typeof result.sectorInsights satisfies "object").toBe("object");
   });
 });
