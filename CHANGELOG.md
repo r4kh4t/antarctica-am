@@ -9,6 +9,14 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.7.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.6.0...antarctica-portfolio-recommendation-v1.7.0) (2026-05-03)
+
+
+### Features
+
+* actual data ([bcf1219](https://github.com/r4kh4t/antarctica-am-draft/commit/bcf1219f86bed75d603ba19aff31b22c64a3a380))
+* **data:** Zod validation on raw JSON inputs in actualData.ts ([#38](https://github.com/r4kh4t/antarctica-am-draft/issues/38)) ([393ed40](https://github.com/r4kh4t/antarctica-am-draft/commit/393ed403e9870c7af4577fddfd3e4b83fcae0fcd))
+
 ## [1.7.1] — 2026-05-03
 
 ### Added
