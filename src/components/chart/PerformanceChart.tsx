@@ -145,21 +145,15 @@ function LineLegend({
 
 // ─── Fund selector dropdown ───────────────────────────────────────────────────
 
+/** Individual holdings only — benchmark is toggled under Portfolio, not Funds. */
 type FundSelectProps = {
   tickers: string[];
-  benchmarkName: string;
   tickerColorMap: Record<string, string>;
   hiddenSeries: Set<string>;
   onToggle: (key: string) => void;
 };
 
-function FundSelect({
-  tickers,
-  benchmarkName,
-  tickerColorMap,
-  hiddenSeries,
-  onToggle,
-}: FundSelectProps) {
+function FundSelect({ tickers, tickerColorMap, hiddenSeries, onToggle }: FundSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -172,23 +166,23 @@ function FundSelect({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const allKeys = [KEY_BENCHMARK, ...tickers];
-  const visibleCount = allKeys.filter((k) => !hiddenSeries.has(k)).length;
+  const fundKeys = tickers;
+  const visibleCount = fundKeys.filter((k) => !hiddenSeries.has(k)).length;
 
   const summaryLabel =
-    visibleCount === allKeys.length
-      ? `All (${allKeys.length})`
+    visibleCount === fundKeys.length
+      ? `All (${fundKeys.length})`
       : visibleCount === 0
         ? "None selected"
-        : `${visibleCount} of ${allKeys.length}`;
+        : `${visibleCount} of ${fundKeys.length}`;
 
   function showAll() {
-    for (const k of allKeys) {
+    for (const k of fundKeys) {
       if (hiddenSeries.has(k)) onToggle(k);
     }
   }
   function hideAll() {
-    for (const k of allKeys) {
+    for (const k of fundKeys) {
       if (!hiddenSeries.has(k)) onToggle(k);
     }
   }
@@ -221,24 +215,6 @@ function FundSelect({
           </div>
 
           <div className="max-h-64 overflow-y-auto py-1">
-            {/* Benchmark — always first */}
-            <DropdownRow
-              active={!hiddenSeries.has(KEY_BENCHMARK)}
-              onClick={() => onToggle(KEY_BENCHMARK)}
-              legend={
-                <LineLegend
-                  color={BENCHMARK_COLOR}
-                  dashed
-                  active={!hiddenSeries.has(KEY_BENCHMARK)}
-                />
-              }
-              label="Benchmark"
-              sublabel={benchmarkName.length > 30 ? benchmarkName.slice(0, 28) + "…" : undefined}
-            />
-
-            <div className="mx-3 my-1 border-t border-border" />
-
-            {/* Individual fund tickers */}
             {tickers.map((ticker) => (
               <DropdownRow
                 key={ticker}
@@ -265,6 +241,7 @@ function FundSelect({
 type PortfolioSelectProps = {
   hiddenSeries: Set<string>;
   onToggle: (key: string) => void;
+  /** Shown under Benchmark in this menu (individual funds are under Funds). */
   benchmarkName: string;
 };
 
@@ -291,7 +268,7 @@ const PORTFOLIO_SERIES = [
   },
 ] as const;
 
-function PortfolioSelect({ hiddenSeries, onToggle }: PortfolioSelectProps) {
+function PortfolioSelect({ hiddenSeries, onToggle, benchmarkName }: PortfolioSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -341,7 +318,15 @@ function PortfolioSelect({ hiddenSeries, onToggle }: PortfolioSelectProps) {
                   <LineLegend color={s.color} dashed={s.dashed} active={!hiddenSeries.has(s.key)} />
                 }
                 label={s.label}
-                sublabel={"sublabel" in s ? s.sublabel : undefined}
+                sublabel={
+                  s.key === KEY_BENCHMARK && benchmarkName
+                    ? benchmarkName.length > 30
+                      ? `${benchmarkName.slice(0, 28)}…`
+                      : benchmarkName
+                    : "sublabel" in s
+                      ? s.sublabel
+                      : undefined
+                }
               />
             ))}
           </div>
@@ -698,7 +683,6 @@ export function PerformanceChart({
           </p>
           <FundSelect
             tickers={tickers}
-            benchmarkName={benchmarkName}
             tickerColorMap={tickerColorMap}
             hiddenSeries={hiddenSeries}
             onToggle={toggleSeries}

@@ -426,7 +426,7 @@ export function buildPortfolioDataFromActual(): {
   const constraints: Constraints = {
     asOf,
     objective:
-      "Tilt toward assets with stronger realised risk-adjusted monthly returns, subject to caps in `constraints.json` and turnover.",
+      "Tilt toward assets with stronger realised risk-adjusted monthly returns, subject to caps in constraints.json and turnover.",
     maxAssetWeight: policyRaw.max_weight,
     minAssetWeight: policyRaw.min_weight,
     maxTurnover: 0.35,

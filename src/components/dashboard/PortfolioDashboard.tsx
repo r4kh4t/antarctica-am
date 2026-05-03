@@ -45,6 +45,26 @@ const SECTOR_STATUS_LABEL: Record<"within" | "below" | "above", string> = {
   above: "Above max",
 };
 
+const CONSTRAINTS_FILENAME = "constraints.json";
+
+/** Highlights the policy filename in the hero objective line. */
+function ObjectiveWithPolicyFile({ text }: { text: string }) {
+  const i = text.indexOf(CONSTRAINTS_FILENAME);
+  if (i === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, i)}
+      <span
+        className="mx-0.5 inline-flex max-w-full items-center align-baseline rounded-lg border border-primary/45 bg-primary/18 px-2 py-0.5 font-mono text-[0.8125rem] font-semibold tabular-nums text-primary shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] ring-1 ring-white/12"
+        title="Policy file: data/constraints.json"
+      >
+        {CONSTRAINTS_FILENAME}
+      </span>
+      {text.slice(i + CONSTRAINTS_FILENAME.length)}
+    </>
+  );
+}
+
 function SummaryMetric({
   label,
   tooltip,
@@ -191,8 +211,9 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
               constraints.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
-              {recommendation.objective} This recommendation is designed to be explainable in a
-              stakeholder debrief rather than hidden behind a black-box optimiser.
+              <ObjectiveWithPolicyFile text={recommendation.objective} /> This recommendation is
+              designed to be explainable in a stakeholder debrief rather than hidden behind a
+              black-box optimiser.
             </p>
           </div>
 

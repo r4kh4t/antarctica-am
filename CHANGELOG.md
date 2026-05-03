@@ -9,21 +9,19 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
-## [Unreleased]
+## [1.12.0] — 2026-05-03
 
-### Documentation
+### Changed (UI)
 
-- Sync portfolio methodology wording across `README.md`, `AGENTS.md`, `docs/recommendation-methodology.md`, `docs/architecture.md`, and `.cursor/rules/portfolio-domain.mdc` (partial first month, merged duplicate ISINs, release-please manifest alignment with `package.json`).
+- `PerformanceChart`: **Funds** dropdown lists **holdings only** (e.g. 10 lines); benchmark is toggled under **Portfolio** only. Benchmark index name appears as the subtitle under **Benchmark** in the Portfolio menu.
+- `MethodologyCard`: monthly return arithmetic is styled as an inline **`code`** chip (`r = P(end)/P(prev) - 1`) for readability.
+- `PortfolioDashboard`: **`constraints.json`** in the hero objective is shown as a highlighted monospace pill (tooltip: policy file lives at `data/constraints.json`).
+
+### Changed
+
+- `actualData.ts` hero objective copy no longer wraps the filename in Markdown backticks; the dashboard renders the highlight.
 
 ---
-
-## [1.7.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.6.0...antarctica-portfolio-recommendation-v1.7.0) (2026-05-03)
-
-
-### Features
-
-* actual data ([bcf1219](https://github.com/r4kh4t/antarctica-am-draft/commit/bcf1219f86bed75d603ba19aff31b22c64a3a380))
-* **data:** Zod validation on raw JSON inputs in actualData.ts ([#38](https://github.com/r4kh4t/antarctica-am-draft/issues/38)) ([393ed40](https://github.com/r4kh4t/antarctica-am-draft/commit/393ed403e9870c7af4577fddfd3e4b83fcae0fcd))
 
 ## [1.11.0] — 2026-05-03
 
