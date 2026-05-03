@@ -28,7 +28,7 @@ data/*.json  (holdings, prices, benchmark, constraints)
 | `table/` | `RecommendationTable`, `TableControls` (filters + sort), `types.ts` (shared filter/sort types) |
 | `chart/` | `AnalyticsSection` (tab shell), `WeightChartContent`, `PerformanceChart`, `RiskReturnChart`, `SectorChart`, `rechartsSizing.ts` |
 | `shared/` | `Skeleton`, `Tooltip` + `InfoIcon`, `InlineMarkdown` |
-| `providers.tsx` | Client-only provider tree (`RollbarProvider`) |
+| `providers.tsx` | Client-only tree: `RollbarProvider`, Vercel **Web Analytics**, **Speed Insights** |
 
 ## LLM Utilities (`src/lib/llm/`)
 

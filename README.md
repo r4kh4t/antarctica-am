@@ -172,15 +172,21 @@ npm run build
 
 After deployment, replace the pending Vercel URL above with the live URL before submitting.
 
+Enable **Web Analytics** and **Speed Insights** on the deployment: Vercel project → **Analytics** / **Speed Insights** → enable for the project (the SDK is already wired in `src/components/providers.tsx`).
+
 ## Vercel Tools
 
 The following free tools are integrated:
 
 | Tool | What it does | Free tier |
 |---|---|---|
-| **Web Analytics** | Privacy-first page views and visitor stats — no cookies, no GDPR issues | 50,000 events/month (Hobby) |
-| **Speed Insights** | Core Web Vitals (LCP, CLS, FID) per real user visit | 10,000 data points/month (Hobby) |
+| **Web Analytics** | Privacy-first page views and visitor stats — no cookies, no GDPR issues | 50,000 events/month (Hobby); enable in project **Analytics** tab |
+| **Speed Insights** | Core Web Vitals (LCP, CLS, INP) per real user visit | 10,000 data points/month (Hobby); enable in **Speed Insights** tab |
 | **Rollbar** | Real-time error tracking for client and server, with stack traces and deploy tracking | 5,000 events/month (free forever) |
+
+### Web Analytics & Speed Insights
+
+`@vercel/analytics` and `@vercel/speed-insights` are mounted in **`src/components/providers.tsx`** (same client tree as Rollbar). Turn them on in the Vercel dashboard for your project, then redeploy if needed so data starts flowing.
 
 ### Rollbar setup
 
@@ -193,7 +199,7 @@ The quickest path is through the Vercel dashboard — it auto-provisions both to
 For local development, copy the tokens from the Vercel dashboard into `.env.local` (see `.env.example`).
 
 Rollbar captures:
-- Uncaught browser exceptions and promise rejections (via `<RollbarProvider>` in `layout.tsx`)
+- Uncaught browser exceptions and promise rejections (via `<RollbarProvider>` in `providers.tsx`)
 - Root layout crashes (via `global-error.tsx`)
 - Server-side API route failures (via `captureServerError()` in `src/lib/rollbar.ts`)
 

@@ -20,6 +20,7 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 ### Changed
 
 - `actualData.ts` hero objective copy no longer wraps the filename in Markdown backticks; the dashboard renders the highlight.
+- **Vercel Web Analytics** and **Speed Insights** (`@vercel/analytics`, `@vercel/speed-insights`) are mounted in **`providers.tsx`** alongside Rollbar; README documents enabling both in the Vercel project dashboard.
 
 ---
 
