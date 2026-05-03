@@ -11,14 +11,15 @@ function MethodologyBody({ text }: { text: string }) {
     return <>{text}</>;
   }
   const [before, after] = text.split(MONTHLY_RETURN_FORMULA);
+  const tail = after.trimStart();
   return (
-    <>
-      {before}
-      <code className="mx-0.5 inline rounded-md border border-white/20 bg-white/12 px-1.5 py-0.5 font-mono text-[0.8125rem] font-medium leading-none text-white/95 tabular-nums">
+    <span className="flex flex-col gap-1.5">
+      <span>{before.trimEnd()}</span>
+      <code className="inline-block w-fit max-w-full rounded-md border border-white/20 bg-white/12 px-2 py-1 font-mono text-[0.8125rem] font-medium leading-snug text-white/95 tabular-nums">
         {MONTHLY_RETURN_FORMULA}
       </code>
-      {after}
-    </>
+      {tail.length > 0 ? <span>{tail}</span> : null}
+    </span>
   );
 }
 
