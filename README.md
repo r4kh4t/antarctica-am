@@ -68,23 +68,63 @@ Authoritative inputs live under `data/`:
 | `benchmark.json` | Daily benchmark levels |
 | `constraints.json` | Min/max line size, per–asset-class caps, `max_assets` |
 
-`src/lib/portfolio/actualData.ts` normalises this into the app's internal shape: unique `assetId` per line (duplicate ISINs get distinct IDs and share a cloned price series), all date formats unified to `YYYY-MM-DD` via `date-fns`, weights renormalised to sum to 100%, asset class → sector for caps, and assumed turnover cap where the policy file is silent.
+`src/lib/portfolio/actualData.ts` normalises this into the app's internal shape and collects a structured `DataWarning[]` describing every resolution applied, so the debrief can audit how raw input became clean input. On the current dataset this produces 12 resolved issues surfaced in the **Data Quality** panel:
+
+- Duplicate ISIN rows merged (weights summed, first-seen name kept) so the pipeline sees one economic position per ISIN.
+- Asset-class labels normalised to canonical values matching the constraint keys (`"equity"` → `"Equity"`, `"fixed-income"` / `"FI"` → `"Fixed Income"`).
+- Currency aliases mapped to ISO 4217 codes (`"US$"` → `"USD"`).
+- Holdings weight shortfall interpreted as unallocated cash (e.g. `0.98` sum → `"2.0% treated as unallocated cash"`); internally rescaled to 100% so downstream math is consistent.
+- Price dates unified to `YYYY-MM-DD` via a single normaliser that accepts Excel serial numbers, ISO timestamps, and `DD/MM/YYYY` strings.
+- Price values encoded as JSON strings coerced to numbers (the dataset has ~20% of rows in this form).
+- **3-sigma outlier detection per ISIN**: values more than three population standard deviations from an ISIN's mean are flagged for review but kept in the calculations until manually excluded.
+- Benchmark duplicate dates resolved with a "last entry wins" convention.
+- Soft constraint caps reported where `per_asset_class_caps` sums to less than 1.
+
+## Return calculation
+
+Cumulative return series on the chart are **anchored to the first data point** (day one), not to the first month-end. The first partial month's change is included, so the April 2023 benchmark drawdown of −10.65% is visible in the series rather than silently discarded as part of the indexing.
+
+Concretely, `calculateAssetMonthlyReturns` and `calculateBenchmarkMonthlyReturns` emit a monthly return series whose compounded cumulative value at any month equals `level[month_end] / level[first_data_point]` to floating-point precision. The invariant is asserted by unit tests and was verified over the full 36-month benchmark window (zero difference at every month).
+
+Chart rendering is indexed to 100 at day one:
+
+- **Y-axis** shows signed cumulative return (`+27.85%`, `-5%`, etc.).
+- **Tooltip** shows both the indexed value and the signed percent (e.g. `127.85  (+27.85%)`).
+- **Start baseline** is the dashed horizontal line at 100 representing 0% cumulative return.
+
+This is the industry-standard time-weighted return convention. A stakeholder reading the chart at `2025-03` sees `+27.85%` — exactly `1278.55 / 1000.00 − 1` from the raw `benchmark.json` levels, no rounding.
 
 ## Recommendation method
 
-The brief asks to optimise on monthly returns but leaves every other decision open. Rather than a full mean-variance (Markowitz) solve — which requires a stable covariance matrix, is sensitive to estimation error on a thin monthly sample, and is opaque to non-quant stakeholders — this implementation scores each asset using a **Sharpe-like ratio**: annualised arithmetic mean of monthly returns divided by annualised monthly volatility. Proposed weights are formed by **tilting from the current book** toward higher-scoring names (bounded z-score tilt, not a full rebuild from zero), then projected onto soft constraints via iterative rescaling. Monthly returns are **arithmetic** (`P_t / P_{t-1} − 1`) using the last available daily close in each calendar month; no forward-fill is applied across missing dates. Soft constraints — per-asset floor and cap, asset-class ceilings, turnover budget — are enforced by iterative projection and normalisation rather than a constrained quadratic programme, so violations shrink but are not guaranteed to be exactly zero. The result is deterministic, fully traceable in a dozen lines of TypeScript, and every allocation decision can be explained in plain English — the right trade-off for a small stakeholder-facing fund and a take-home where the debrief matters as much as the output.
+The brief asks to optimise on monthly returns but leaves every other decision open. Rather than a full mean-variance (Markowitz) solve — which requires a stable covariance matrix, is sensitive to estimation error on a thin monthly sample, and is opaque to non-quant stakeholders — this implementation scores each asset using a **Sharpe-like ratio**: annualised arithmetic mean of monthly returns divided by annualised monthly volatility. Proposed weights are formed by **tilting from the current book** toward higher-scoring names (bounded z-score tilt, not a full rebuild from zero), then projected onto soft constraints via iterative rescaling. Monthly return construction follows `docs/recommendation-methodology.md`: a **partial first calendar month** from the first observation to that month’s month-end close when applicable, then **month-end to month-end** arithmetic links (`P_t / P_{t-1} − 1`); no forward-fill is applied across missing dates. Cumulative performance on the dashboard compounds from day one (see **Return calculation** above). Soft constraints — per-asset floor and cap, asset-class ceilings, turnover budget — are enforced by iterative projection and normalisation rather than a constrained quadratic programme, so violations shrink but are not guaranteed to be exactly zero. The result is deterministic, fully traceable in a dozen lines of TypeScript, and every allocation decision can be explained in plain English — the right trade-off for a small stakeholder-facing fund and a take-home where the debrief matters as much as the output.
 
 | Decision | Choice | Why |
 |---|---|---|
 | Objective | Sharpe-like score (return ÷ volatility) | Explainable ranking; no covariance matrix needed |
-| Return definition | Arithmetic monthly, month-end close | Matches stakeholder reporting; log returns rank identically for small moves |
+| Return definition | Partial first month, then arithmetic month-end closes | Matches time-weighted convention; cumulative chart equals raw level ratio (see tests) |
 | Missing prices | Drop interval, no forward-fill | Forward-fill would fabricate volatility; sparse months shorten sample visibly |
 | Soft constraints | Iterative projection (not QP) | Transparent, testable, no solver dependency |
-| Cardinality (`max_assets`) | Documented conflict, not enforced | Simultaneous min-line-size + max-names requires mixed-integer optimisation |
+| Cardinality (`max_assets`) | Soft violation surfaced in UI when breached | Tilt + projection retains all economically relevant names unless a mixed-integer step is added; min line size × max names is inherently combinatorial |
 
 See [`docs/recommendation-methodology.md`](docs/recommendation-methodology.md) for the exact formulas and implementation notes.
 
 The UI stays thin; the portfolio layer holds the decisions worth reviewing in code review and debrief.
+
+### Reviewer note — investment methodology (what “sure” means here)
+
+**Internally consistent and auditable**
+
+- Monthly return construction (partial first month, then month-end chain) is explicit in code and in [`docs/recommendation-methodology.md`](docs/recommendation-methodology.md). Cumulative values on the chart match the compounded series and benchmark cross-check against raw levels is covered by tests.
+- The recommendation path is deterministic: same inputs (`data/*.json` after normalisation), same numeric output. Loader resolutions are enumerated in [`src/lib/portfolio/actualData.ts`](src/lib/portfolio/actualData.ts) and surfaced in **Data Quality** so nothing material is silently “fixed” without disclosure.
+
+**Not something to ship as standalone alpha without extension**
+
+- The headline ratio is **not** textbook Sharpe: there is **no subtraction of a risk‑free rate**. It is an explainable ranking heuristic on monthly arithmetic returns.
+- There is **no covariance model** beyond what is embedded in realised portfolio histories; downside, factor, and correlation structure are **not** explicitly controlled.
+- **FX** line items are labelled in the source file but are **not** converted to a single numeraire; treat cross‑currency mixes as an explicit data limitation for any live deployment.
+- **Outliers** are flagged per ISIN (3‑sigma) but **remain in returns** unless data is curated — appropriate for transparency, conservative for naive backtests.
+
+In short: the maths is internally coherent and reproducible from the artefacts in-repo; claiming “100% completeness” versus all possible modelling choices would be wrong. Anything above is a deliberate scope boundary for clarity in the debrief, not an undiscovered hole in the arithmetic.
 
 ## Application Structure
 
@@ -166,9 +206,19 @@ When `NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN` / `ROLLBAR_SERVER_TOKEN` are blank, Roll
 | [Checkly](https://vercel.com/integrations/checkly) | Synthetic monitoring (Playwright health checks) | Free tier available |
 | [PostHog](https://vercel.com/integrations/posthog) | Session replay + product analytics | Free tier: 1M events/month |
 
-## Next Steps
+## Roadmap and next steps
 
-The following are tracked as open GitHub issues on [r4kh4t/antarctica-am-draft](https://github.com/r4kh4t/antarctica-am-draft/issues):
+**Engineering backlog (authoritative)**
+
+All technical work items — tests, tooling, accessibility, optimisation, solver experiments, APIs — live in **[GitHub Issues](https://github.com/r4kh4t/antarctica-am-draft/issues)** for labeling, sequencing, and discussion. What follows below is illustrative; Open + Backlog tabs on that page are the source of truth.
+
+**Product and research prompts (conversation starters for the debrief)**
+
+- Scenario / sensitivity views on constraints and turnover
+- Hosted or selectable input files for repeatability demos
+- How far to extend the optimisation engine (cardinality, FX model, covariance) before diminishing returns versus transparency
+
+Representative Issues (subset):
 
 | # | Area | Description |
 |---|---|---|
@@ -178,7 +228,7 @@ The following are tracked as open GitHub issues on [r4kh4t/antarctica-am-draft](
 | [#20](https://github.com/r4kh4t/antarctica-am-draft/issues/20) | Testing | E2E tests with Playwright for the main dashboard flow |
 | [#22](https://github.com/r4kh4t/antarctica-am-draft/issues/22) | Perf | Bundle size analysis and reduction |
 | [#23](https://github.com/r4kh4t/antarctica-am-draft/issues/23) | Security | Rate-limit `/api/rationale` to prevent LLM cost abuse |
-| Backlog | Robustness | Add Zod validation on raw `data/*.json` inputs at load time |
+| Backlog | Robustness | Extend regression coverage around loader corner cases (`actualData.ts`, date/price coercion) |
 | Backlog | Robustness | Extend `validateRationaleRequest` to cover `summary`, `sectorExposures`, `benchmarkName` fields |
 | Backlog | A11y | Add `aria-describedby` to `InfoIcon` tooltip triggers for screen-reader support |
 | Backlog | Optimisation | Mixed-integer solver for cardinality (`max_assets`) combined with minimum line-size constraints |

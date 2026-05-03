@@ -10,7 +10,7 @@ function sum(values: number[]) {
 }
 
 describe("monthly return calculation", () => {
-  it("uses the final available daily price in each month", () => {
+  it("includes a partial first-month return and uses the final available daily price in each month", () => {
     const prices: PricePoint[] = [
       { assetId: "A", date: "2025-01-02", close: 100 },
       { assetId: "A", date: "2025-01-31", close: 110 },
@@ -21,17 +21,32 @@ describe("monthly return calculation", () => {
 
     const returns = calculateAssetMonthlyReturns(prices);
 
-    expect(returns).toHaveLength(2);
-    expect(returns[0]).toMatchObject({ assetId: "A", month: "2025-02" });
-    expect(returns[0]?.return).toBeCloseTo(0.1, 8);
-    expect(returns[1]).toMatchObject({ assetId: "A", month: "2025-03" });
-    expect(returns[1]?.return).toBeCloseTo(115 / 121 - 1, 8);
+    // Partial first month (Jan 2 → Jan 31) + full Feb + full Mar
+    expect(returns).toHaveLength(3);
+    expect(returns[0]).toMatchObject({ assetId: "A", month: "2025-01" });
+    expect(returns[0]?.return).toBeCloseTo(110 / 100 - 1, 8);
+    expect(returns[1]).toMatchObject({ assetId: "A", month: "2025-02" });
+    expect(returns[1]?.return).toBeCloseTo(121 / 110 - 1, 8);
+    expect(returns[2]).toMatchObject({ assetId: "A", month: "2025-03" });
+    expect(returns[2]?.return).toBeCloseTo(115 / 121 - 1, 8);
   });
 
-  it("returns no monthly returns for sparse single-month data", () => {
+  it("returns no monthly returns for a single data point exactly at month end", () => {
+    // Single row that IS the month end — no intra-month baseline to anchor against.
     expect(
       calculateAssetMonthlyReturns([{ assetId: "A", date: "2025-01-31", close: 100 }]),
     ).toEqual([]);
+  });
+
+  it("records a partial first-month return when there are two observations in the same month", () => {
+    const returns = calculateAssetMonthlyReturns([
+      { assetId: "A", date: "2025-01-02", close: 100 },
+      { assetId: "A", date: "2025-01-20", close: 110 },
+    ]);
+
+    expect(returns).toHaveLength(1);
+    expect(returns[0]).toMatchObject({ assetId: "A", month: "2025-01" });
+    expect(returns[0]?.return).toBeCloseTo(0.1, 8);
   });
 });
 

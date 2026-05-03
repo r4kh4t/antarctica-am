@@ -25,7 +25,7 @@ finding. At the end, print a go/no-go verdict.
 ```bash
 npm run format:check   # Biome formatting
 npm run lint           # ESLint
-npm test               # 38 unit tests
+npm test               # unit tests (~49 portfolio + LLM suites)
 npm run build          # TypeScript + Next.js production build
 ```
 

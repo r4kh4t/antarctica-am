@@ -8,9 +8,14 @@ Why not full Markowitz mean–variance here: the brief rewards transparency and 
 
 ## Monthly returns (definition)
 
-1. Build a **month-end price** for each calendar month using the **last available daily close** in that month (per asset).
-2. Month-on-month return is **arithmetic**: `r = P(end)/P(prev) - 1`. Log returns would reorder ranks only slightly for typical equity ranges; arithmetic matches stakeholder reporting.
-3. Annualised return uses compound arithmetic on the average monthly return: `(1 + mean monthly)^12 - 1`. Volatility scales the monthly sample standard deviation by `sqrt(12)`.
+1. Build a **month-end price** for each calendar month using the **last available daily close** in that month (per asset and for the benchmark level series).
+2. **First partial month.** If the **first observation** in the series is *earlier than* that month’s month-end observation, prepend one return for that calendar month:
+   \(r_{\text{first}} = \frac{P_{\text{month-end, first month}}}{P_{\text{first obs}}} - 1\).
+   Subsequent months remain standard month-over-month links: arithmetic `r = P(end)/P(prev) − 1` between consecutive month-end values.
+3. Cumulative charts compound these monthly arithmetic returns starting from index 100 on day one. For any month **M**, the compounded index satisfies  
+   \(\prod_{m \le M}(1 + r_m) = \frac{\text{level at M’s month-end}}{\text{level at first data point}}\)  
+   (benchmark verified in unit tests to floating-point precision).
+4. Annualised return in scoring uses compound arithmetic on the **average** monthly return: `(1 + mean monthly)^12 - 1`. Volatility scales the monthly **sample** standard deviation by `sqrt(12)`.
 
 ## Missing or messy price data
 
@@ -24,10 +29,11 @@ Why not full Markowitz mean–variance here: the brief rewards transparency and 
 - Per-asset floor and cap (`min_weight`, `max_weight` in the policy file, mapped to `minAssetWeight` / `maxAssetWeight`).
 - Asset-class caps (`per_asset_class_caps`) become sector **ceilings** with floor 0 in the internal model (asset class from the holdings file is treated as the sector bucket).
 - **Turnover**: the policy file does not specify turnover; the loader assumes a **default cap** (see `actualData.ts` / README) so the pipeline stays bounded—documented as an explicit assumption.
-- **`max_assets`**: the file caps the number of names; simultaneously enforcing a positive minimum line size on every name would require **cardinality** (integer) optimisation. The app **records** this trade-off in constraint notes and methodology rather than silently merging positions—full enforcement is left as an explicit limitation and debrief topic.
+- **`max_assets`**: the file caps the number of names. The optimiser uses **weight tilting** from the current book with iterative projection; it does **not** run a mixed-integer programme to zero out names. When the implied number of active lines exceeds the cap, the Data Quality / constraint panel reports a **soft violation** and documents the trade-off. Full cardinality enforcement is an explicit limitation and a documented roadmap item.
 
 ## Known limitations
 
 - Correlations enter only through the **realised** portfolio return series used for rough ex-post volatility, not a full covariance matrix.
-- Duplicate ISINs in holdings share one price series; the loader duplicates points per portfolio line so each `assetId` has a return history.
+- **Duplicate ISINs** in raw holdings are **merged at load** (weights summed, first-seen name kept) so the economic position is one line per ISIN; price history is not double-counted in the optimiser.
 - Mixed line currencies in the source holdings are **not** FX-converted; portfolio `currency` is taken as USD for presentation consistency—another explicit assumption.
+- The ranking uses **mean / volatility** on monthly returns without subtracting a **risk-free rate**; call it a Sharpe-like heuristic, not a textbook Sharpe ratio.

@@ -9,6 +9,14 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [Unreleased]
+
+### Documentation
+
+- Sync portfolio methodology wording across `README.md`, `AGENTS.md`, `docs/recommendation-methodology.md`, `docs/architecture.md`, and `.cursor/rules/portfolio-domain.mdc` (partial first month, merged duplicate ISINs, release-please manifest alignment with `package.json`).
+
+---
+
 ## [1.7.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.6.0...antarctica-portfolio-recommendation-v1.7.0) (2026-05-03)
 
 
@@ -40,6 +48,13 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 - `PerformanceChart` y-axis now displays cumulative return as a signed percentage (`+23%`, `-5%`) instead of raw indexed values. Tooltip shows **both** the indexed value and the signed percent (e.g. `123.45 (+23.45%)`) so the scale and the performance read are visible at the same time. Internal arithmetic is unchanged — series are still compounded on a 100-base for correctness.
 - Decision Summary "Constraint status" now honestly reflects **all three** soft checks (max-assets cardinality, weight bounds, asset-class caps). Previously the field only looked at sector exposures and would read `"Within soft constraints"` even when max-assets was violated. New display is `"N of 3 violated"` with colour coding (green / amber / red) and a subtitle pointing to the Data Quality panel for detail. Underlying `summary.constraintStatus` logic and type are unchanged for backward compatibility; the dashboard now derives the richer display from `constraintCompliance` directly.
+
+### Changed (math)
+
+- `calculateAssetMonthlyReturns` and `calculateBenchmarkMonthlyReturns` now include a **partial first-month return** (first observation → first month-end) in addition to the standard month-over-month returns. Chart series are now anchored to the very first data point (day one) rather than to the first month-end, which is industry-standard for time-weighted return reporting and captures the full drawdown/gain an investor would experience. New `monthlyReturnsSeries` helper encapsulates the logic.
+- Verified against raw benchmark data: the compounded cumulative series now equals `level[month_end] / level[first_data_point]` to floating-point precision at every month (zero difference across the full 36-month window).
+- Previously the first-month partial return was silently discarded, producing a cumulative series anchored to the first month-end. With the April 2023 benchmark drawdown of -10.65% that caused our series to read `+43.09%` at 2025-03 when the true time-weighted return from 2023-04-05 is `+27.85%`.
+- New tests in `recommendation.test.ts`: partial first-month expectation and the two-observation-same-month edge case.
 
 ### Tooling
 

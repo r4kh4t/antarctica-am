@@ -7,10 +7,10 @@ description: Build or modify the Antarctica portfolio recommendation workflow. U
 
 ## Instructions
 
-1. Start from `data/holdings.json`, `prices.json`, `benchmark.json`, and `constraints.json`, mapped in `src/lib/portfolio/actualData.ts`.
-2. Convert daily prices and benchmark levels to month-end series before calculating returns.
+1. Start from `data/holdings.json`, `prices.json`, `benchmark.json`, and `constraints.json`, mapped in `src/lib/portfolio/actualData.ts` (normalisation + structured `DataWarning[]`; duplicate ISIN rows merged).
+2. Convert daily prices and benchmark levels into a **monthly return series**: optional **partial first month** from first observation to first month-end, then standard month-over-month links at month-end closes (see `monthlyReturnsSeries` / `monthlyReturns.ts`).
 3. Score assets using risk-adjusted monthly performance, then tilt from current weights.
-4. Apply soft constraints after scoring: asset bounds, sector bounds, turnover, and total weight.
+4. Apply soft constraints after scoring: asset bounds, sector bounds, turnover, and total weight. Surface **max_assets** cardinality as a documented soft violation when the tilt retains more names than the cap.
 5. Keep output deterministic and explainable. Each asset needs a plain-English rationale.
 6. Validate changes with `npm test`; run `npm run lint` and `npm run build` before delivery.
 
@@ -18,7 +18,7 @@ description: Build or modify the Antarctica portfolio recommendation workflow. U
 
 When explaining the approach, cover:
 
-- how author-supplied JSON was normalised (ISIN, dates, weights);
+- how author-supplied JSON was normalised (ISIN merges, duplicate rows, dates, weights, currencies, outliers flagged vs excluded);
 - why monthly returns drive the recommendation;
 - why a pragmatic scorer was chosen over an opaque optimiser;
 - where constraints affected the final weights;
