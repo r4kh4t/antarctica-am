@@ -706,7 +706,7 @@ export function PerformanceChart({
         </div>
 
         <div className="self-end pb-2">
-          <p className="text-xs text-secondary/50">Growth of 100 indexed to start of range</p>
+          <p className="text-xs text-secondary/50">Cumulative return (%) vs start of range</p>
           {firstMonth && lastMonth && (
             <p className="mt-0.5 text-xs text-secondary/35">
               Data: {formatMonthLabel(firstMonth)} – {formatMonthLabel(lastMonth)}
@@ -740,7 +740,11 @@ export function PerformanceChart({
               tickLine={false}
               axisLine={false}
               width={52}
-              tickFormatter={(v) => v.toFixed(0)}
+              tickFormatter={(v) => {
+                const pct = v - 100;
+                const sign = pct > 0 ? "+" : "";
+                return `${sign}${pct.toFixed(0)}%`;
+              }}
               domain={[
                 (dataMin: number) => Math.floor(Math.min(dataMin, 97) / 5) * 5,
                 (dataMax: number) => Math.ceil(Math.max(dataMax, 103) / 5) * 5,
@@ -757,7 +761,11 @@ export function PerformanceChart({
                       : name === KEY_RECOMMENDED
                         ? "Recommended"
                         : String(name);
-                return [`${Number(value).toFixed(1)}`, label];
+                const raw = Number(value);
+                const pct = raw - 100;
+                const sign = pct > 0 ? "+" : "";
+                // Show both: indexed value (100 = start) and cumulative return as a signed percent
+                return [`${raw.toFixed(2)}  (${sign}${pct.toFixed(2)}%)`, label];
               }}
               labelStyle={{ fontWeight: 600, marginBottom: 4 }}
               contentStyle={{ fontSize: 12, borderRadius: 12, border: "1px solid #d8d8d2" }}

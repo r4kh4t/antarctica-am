@@ -199,9 +199,6 @@ export function buildPortfolioRecommendation(
   const currentWeightMap = currentWeights(holdings.assets);
   const sectorExposures = getSectorExposures(holdings.assets, recommendedWeights, constraints);
   const benchmarkMonthlyReturns = calculateBenchmarkMonthlyReturns(benchmark.levels);
-  const constraintStatus = sectorExposures.every((sector) => sector.status === "within")
-    ? "Within soft constraints"
-    : "Review required";
 
   const rows = metrics
     .map((metric) => {
@@ -236,6 +233,18 @@ export function buildPortfolioRecommendation(
   );
 
   const constraintCompliance = computeConstraintCompliance(rows, constraints, sectorExposures);
+
+  // Honest overall constraint status — considers ALL three soft checks, not
+  // just sector caps. Keep the two-state union for backward compatibility;
+  // the dashboard can read constraintCompliance directly for a richer view.
+  const allConstraintsPassed =
+    constraintCompliance.maxAssets.passed &&
+    constraintCompliance.weightBounds.passed &&
+    constraintCompliance.classCaps.passed &&
+    sectorExposures.every((sector) => sector.status === "within");
+  const constraintStatus: "Within soft constraints" | "Review required" = allConstraintsPassed
+    ? "Within soft constraints"
+    : "Review required";
 
   return {
     asOf: holdings.asOf,

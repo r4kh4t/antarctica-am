@@ -30,7 +30,7 @@ const SUMMARY_TOOLTIPS = {
     "Arithmetic average of the benchmark's monthly returns over the available price history.",
   materialChanges: "Count of assets where the absolute weight change is ≥ 0.5 percentage points.",
   constraints:
-    "Whether all sector allocations and individual asset limits fall within the soft policy bounds after applying the recommendation.",
+    "Summary of three soft policy checks after applying the recommendation: max-assets cardinality, per-asset weight bounds (min/max line), and asset-class caps. See the Data Quality panel for per-rule detail.",
 };
 
 const SECTOR_STATUS_STYLE: Record<"within" | "below" | "above", string> = {
@@ -141,6 +141,25 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
     (r) => Math.abs(r.weightDelta) >= 0.005,
   ).length;
 
+  const complianceChecks = [
+    recommendation.constraintCompliance.maxAssets.passed,
+    recommendation.constraintCompliance.weightBounds.passed,
+    recommendation.constraintCompliance.classCaps.passed,
+  ];
+  const passedChecks = complianceChecks.filter(Boolean).length;
+  const totalChecks = complianceChecks.length;
+  const failedChecks = totalChecks - passedChecks;
+  const constraintStatusLabel =
+    failedChecks === 0
+      ? `All ${totalChecks} checks passed`
+      : `${failedChecks} of ${totalChecks} violated`;
+  const constraintStatusColor =
+    failedChecks === 0
+      ? "text-emerald-300"
+      : failedChecks === totalChecks
+        ? "text-rose-300"
+        : "text-amber-300";
+
   const sectorInsights = aiState.status === AI_STATUS.LOADED ? aiState.sectorInsights : {};
 
   return (
@@ -237,9 +256,14 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
                 label="Constraint status"
                 tooltip={SUMMARY_TOOLTIPS.constraints}
                 value={
-                  <span className="text-sm leading-snug">
-                    {recommendation.summary.constraintStatus}
+                  <span className={`text-sm font-semibold leading-snug ${constraintStatusColor}`}>
+                    {constraintStatusLabel}
                   </span>
+                }
+                sub={
+                  failedChecks > 0
+                    ? "See Data Quality panel for detail"
+                    : "Max assets · Weight bounds · Class caps"
                 }
               />
             </dl>

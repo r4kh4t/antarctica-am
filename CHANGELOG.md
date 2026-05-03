@@ -36,6 +36,11 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 - `PerformanceChart` now defaults the `rows` prop to `[]` and makes it optional in the type. Prevents a transient Fast Refresh crash (`Cannot read properties of undefined (reading 'reduce')`) when a stale client bundle renders the chart before a new prop has propagated.
 
+### Changed (UI)
+
+- `PerformanceChart` y-axis now displays cumulative return as a signed percentage (`+23%`, `-5%`) instead of raw indexed values. Tooltip shows **both** the indexed value and the signed percent (e.g. `123.45 (+23.45%)`) so the scale and the performance read are visible at the same time. Internal arithmetic is unchanged — series are still compounded on a 100-base for correctness.
+- Decision Summary "Constraint status" now honestly reflects **all three** soft checks (max-assets cardinality, weight bounds, asset-class caps). Previously the field only looked at sector exposures and would read `"Within soft constraints"` even when max-assets was violated. New display is `"N of 3 violated"` with colour coding (green / amber / red) and a subtitle pointing to the Data Quality panel for detail. Underlying `summary.constraintStatus` logic and type are unchanged for backward compatibility; the dashboard now derives the richer display from `constraintCompliance` directly.
+
 ### Tooling
 
 - `npm run dev` and `npm run build` now set `NODE_OPTIONS=--max-old-space-size=8192` (8 GB) to avoid the default V8 heap ceiling during long-running Turbopack dev sessions with the large `prices.json` import. Added `npm run dev:big` (16 GB) for anyone hitting OOM on very long sessions.
