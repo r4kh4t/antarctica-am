@@ -6,6 +6,7 @@ const BASE_REQUEST: RationaleRequest = {
   rows: [
     {
       assetId: "AAM-LGQ",
+      isin: "AAM-LGQ",
       ticker: "LGQ",
       name: "London Global Quality Equity",
       sector: "Global Equity",
@@ -20,6 +21,7 @@ const BASE_REQUEST: RationaleRequest = {
     },
     {
       assetId: "AAM-IGC",
+      isin: "AAM-IGC",
       ticker: "IGC",
       name: "Investment Grade Credit",
       sector: "Fixed Income",

@@ -6,6 +6,7 @@ import { formatPercent } from "@/lib/portfolio/format";
 import type { PortfolioRecommendation } from "@/lib/portfolio/types";
 import { AI_STATUS, API_ROUTES } from "@/lib/constants";
 import type { AiState } from "@/lib/constants";
+import { DataQualitySummary } from "./DataQualitySummary";
 import { MethodologyCard } from "./MethodologyCard";
 import { RecommendationTable } from "@/components/table";
 import { AnalyticsSection, WeightChartContent } from "@/components/chart";
@@ -245,6 +246,14 @@ export function PortfolioDashboard({ recommendation }: PortfolioDashboardProps) 
           </div>
         </div>
       </header>
+
+      {/* Data Quality + Constraint Compliance */}
+      <div className="mt-6">
+        <DataQualitySummary
+          warnings={recommendation.dataWarnings}
+          constraintCompliance={recommendation.constraintCompliance}
+        />
+      </div>
 
       {/* Allocation + Constraints | Methodology */}
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.55fr_1fr]">

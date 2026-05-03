@@ -17,6 +17,58 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 * actual data ([bcf1219](https://github.com/r4kh4t/antarctica-am-draft/commit/bcf1219f86bed75d603ba19aff31b22c64a3a380))
 * **data:** Zod validation on raw JSON inputs in actualData.ts ([#38](https://github.com/r4kh4t/antarctica-am-draft/issues/38)) ([393ed40](https://github.com/r4kh4t/antarctica-am-draft/commit/393ed403e9870c7af4577fddfd3e4b83fcae0fcd))
 
+## [1.11.0] — 2026-05-03
+
+### Added
+
+- `actualData.ts` now **merges duplicate ISIN rows** at load time (sums weights, keeps first-seen name) rather than carrying them as two separate assets. The downstream pipeline (price join, optimizer, constraint compliance) now sees one economic position per ISIN.
+- **Currency normalization is applied, not just flagged**: `"US$"` and similar aliases are converted to their ISO 4217 codes in the holdings record. New `normalizeCurrencyCode` helper with a mapping for `US$`, `$`, `€`, `£`, `¥`.
+- **3-sigma price outlier detection per ISIN**: population mean/std is computed for each ISIN's price series and values beyond 3σ are flagged with a preview of the outlier values. Outliers are flagged for analyst review but NOT excluded from calculations.
+- **String-encoded price detection**: prices serialised as JSON strings rather than numbers are counted and surfaced as a data quality warning. Coercion via `parseFloat` continues to happen silently in `parseClose` so math is unaffected.
+- Weight-sum warning resolution text now reads `"X% treated as unallocated cash"` rather than `"Scaled by N× to 100%"`. The shortfall interpretation is financially more meaningful for a debrief; internal normalisation still scales to 100% so downstream calculations are unchanged.
+
+### Changed
+
+- With merged duplicates, `computeConstraintCompliance` sees 10 unique active holdings (down from 11). The existing note about tilt-based vs hard selection still applies.
+- `public/data/*.json` refreshed so source-badge links in the Data Quality panel open the same files the pipeline reads.
+
+### Fixed
+
+- `PerformanceChart` now defaults the `rows` prop to `[]` and makes it optional in the type. Prevents a transient Fast Refresh crash (`Cannot read properties of undefined (reading 'reduce')`) when a stale client bundle renders the chart before a new prop has propagated.
+
+### Tooling
+
+- `npm run dev` and `npm run build` now set `NODE_OPTIONS=--max-old-space-size=8192` (8 GB) to avoid the default V8 heap ceiling during long-running Turbopack dev sessions with the large `prices.json` import. Added `npm run dev:big` (16 GB) for anyone hitting OOM on very long sessions.
+
+## [1.10.0] — 2026-05-03
+
+### Added
+
+- `RecommendationRow` and `Asset` now carry an `isin` field threaded from the raw holdings JSON through `actualData.ts` → `recommendation.ts` → the table.
+- ISIN displayed in the recommendation table under each asset name (monospace, muted) — both desktop and mobile card views.
+- `computeConstraintCompliance` now de-duplicates rows by ISIN before counting active holdings, so the duplicate `NTA002E0002` entry no longer inflates the count. Displays as "10 unique holdings / 5 limit" with an inline note explaining the tilt-based optimizer retains all holdings (vs a hard Sharpe-selection step).
+- `ConstraintCompliance.maxAssets` carries a `note` string surfaced in the Data Quality panel; amber ⚠ (not red ✗) is used for the soft max-assets violation to distinguish it from hard constraint failures.
+
+## [1.9.0] — 2026-05-03
+
+### Added
+
+- `PerformanceChart`: new **Portfolio** filter dropdown showing three aggregated series — Benchmark (dashed), Current Portfolio (amber, weighted at current weights), and Recommended (green, weighted at recommended weights). Each series is computed from the same monthly return data used for individual asset lines.
+- `PerformanceChart`: **Benchmark moved to the top** of the Funds dropdown (previously at the bottom after a divider), making it the most prominent reference series.
+- Both Portfolio and Funds dropdowns share a single `hiddenSeries` state so toggling Benchmark in either filter reflects instantly in the other.
+- `PerformanceChart` accepts a new `rows` prop (passed from `AnalyticsSection`) to derive current and recommended portfolio weights for the aggregate calculations.
+
+## [1.8.0] — 2026-05-03
+
+### Added
+
+- `DataQualitySummary` component: collapsible panel (collapsed by default) that surfaces all 9 data issues resolved at load time — duplicate ISIN, asset class normalizations, non-standard currency, weight scaling, price date format variants, benchmark duplicate dates, and constraint cap gap. Color-coded `[source]` badges link to the corresponding raw JSON file in `public/data/`. Resolution text upgraded to `font-semibold text-ink` for better readability.
+- `public/data/`: holdings, prices, benchmark, and constraints JSON files exposed as static assets so source badges in the Data Quality panel can link directly to the raw inputs.
+- Constraint compliance section inside `DataQualitySummary`: ✓/✗ per rule (max assets, weight bounds `[2%–25%]`, asset class caps 30%) computed from the live recommendation output.
+- AI disclaimer tooltips on the AI-enhanced badge, the narrative paragraph, and every AI-sourced rationale cell in `RecommendationTable` — noting content is LLM-generated and may not be accurate.
+- `DataWarning` and `ConstraintCompliance` types added to `src/lib/portfolio/types.ts`.
+- `maxAssets` field added to the `Constraints` type and threaded through `actualData.ts` → `data.ts` → `recommendation.ts` → `PortfolioRecommendation`.
+
 ## [1.7.1] — 2026-05-03
 
 ### Added

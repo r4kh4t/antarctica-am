@@ -5,6 +5,7 @@ import type { RecommendationRow } from "@/lib/portfolio/types";
 
 const VALID_ROW: RecommendationRow = {
   assetId: "AAM-LGQ",
+  isin: "AAM-LGQ",
   ticker: "AAM-LGQ",
   name: "London Global Quality Equity",
   sector: "Global Equity",

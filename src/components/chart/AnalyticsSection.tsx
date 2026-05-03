@@ -58,6 +58,7 @@ export function AnalyticsSection({ recommendation }: AnalyticsSectionProps) {
             assetMonthlyReturns={recommendation.assetMonthlyReturns}
             benchmarkMonthlyReturns={recommendation.benchmarkMonthlyReturns}
             benchmarkName={recommendation.benchmarkName}
+            rows={recommendation.rows}
           />
         )}
         {activeTab === "risk-return" && <RiskReturnChart rows={recommendation.rows} />}

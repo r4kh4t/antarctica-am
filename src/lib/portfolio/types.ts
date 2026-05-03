@@ -1,5 +1,18 @@
+export type DataWarning = {
+  source: "holdings" | "prices" | "benchmark" | "constraints";
+  issue: string;
+  resolution: string;
+};
+
+export type ConstraintCompliance = {
+  maxAssets: { passed: boolean; actual: number; limit: number; note: string };
+  weightBounds: { passed: boolean; min: number; max: number; violations: string[] };
+  classCaps: { passed: boolean; violations: string[] };
+};
+
 export type Asset = {
   assetId: string;
+  isin: string;
   ticker: string;
   name: string;
   sector: string;
@@ -49,6 +62,7 @@ export type Constraints = {
   maxAssetWeight: number;
   minAssetWeight: number;
   maxTurnover: number;
+  maxAssets: number;
   sectorBounds: SectorBound[];
   notes: string[];
 };
@@ -72,6 +86,7 @@ export type AssetMetric = {
 
 export type RecommendationRow = {
   assetId: string;
+  isin: string;
   ticker: string;
   name: string;
   sector: string;
@@ -121,4 +136,6 @@ export type PortfolioRecommendation = {
   benchmarkMonthlyReturns: { month: string; return: number }[];
   assetMonthlyReturns: AssetMonthlyReturn[];
   methodology: string[];
+  dataWarnings: DataWarning[];
+  constraintCompliance: ConstraintCompliance;
 };

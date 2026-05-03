@@ -22,7 +22,7 @@ function assertUniqueAssets(assets: Holdings["assets"]) {
 }
 
 export function getPortfolioData() {
-  const { holdings, prices, benchmark, constraints } = buildPortfolioDataFromActual();
+  const { holdings, prices, benchmark, constraints, dataWarnings } = buildPortfolioDataFromActual();
 
   assertUniqueAssets(holdings.assets);
   assertWeightTotal(holdings.assets);
@@ -32,5 +32,6 @@ export function getPortfolioData() {
     prices,
     benchmark,
     constraints,
+    dataWarnings,
   };
 }

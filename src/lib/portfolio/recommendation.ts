@@ -14,7 +14,9 @@ import type {
   Asset,
   AssetMetric,
   Benchmark,
+  ConstraintCompliance,
   Constraints,
+  DataWarning,
   Holdings,
   PortfolioRecommendation,
   Prices,
@@ -119,11 +121,73 @@ function currentWeights(assets: Asset[]) {
   return Object.fromEntries(assets.map((asset) => [asset.assetId, asset.currentWeight]));
 }
 
+function computeConstraintCompliance(
+  rows: { name: string; isin: string; recommendedWeight: number }[],
+  constraints: Constraints,
+  sectorExposures: { sector: string; recommendedWeight: number; max: number }[],
+): ConstraintCompliance {
+  // Count unique ISINs with non-trivial weight — a duplicate ISIN row is the
+  // same economic position, so we de-duplicate before comparing to maxAssets.
+  const uniqueActiveIsins = new Set(
+    rows.filter((r) => r.recommendedWeight > 0.0001).map((r) => r.isin),
+  );
+  const uniqueActiveCount = uniqueActiveIsins.size;
+  const maxAssetsPassed = uniqueActiveCount <= constraints.maxAssets;
+
+  // This optimizer uses weight tilting, not hard selection: all holdings are
+  // retained at adjusted weights. maxAssets is therefore a soft cap.
+  const maxAssetsNote = maxAssetsPassed
+    ? "Tilt-based optimizer — all holdings retained at adjusted weights"
+    : `Soft violation: tilt-based optimizer retains all ${uniqueActiveCount} unique holdings. A hard Sharpe-selection step (zeroing out bottom performers) would enforce the limit of ${constraints.maxAssets} strictly.`;
+
+  const weightViolations: string[] = [];
+  for (const row of rows) {
+    if (row.recommendedWeight > 0.0001) {
+      if (row.recommendedWeight < constraints.minAssetWeight - 0.0001) {
+        weightViolations.push(
+          `${row.name} (${(row.recommendedWeight * 100).toFixed(1)}% < min ${(constraints.minAssetWeight * 100).toFixed(0)}%)`,
+        );
+      }
+      if (row.recommendedWeight > constraints.maxAssetWeight + 0.0001) {
+        weightViolations.push(
+          `${row.name} (${(row.recommendedWeight * 100).toFixed(1)}% > max ${(constraints.maxAssetWeight * 100).toFixed(0)}%)`,
+        );
+      }
+    }
+  }
+
+  const classCapViolations: string[] = [];
+  for (const exposure of sectorExposures) {
+    if (exposure.recommendedWeight > exposure.max + 0.0001) {
+      classCapViolations.push(
+        `${exposure.sector} (${(exposure.recommendedWeight * 100).toFixed(1)}% > cap ${(exposure.max * 100).toFixed(0)}%)`,
+      );
+    }
+  }
+
+  return {
+    maxAssets: {
+      passed: maxAssetsPassed,
+      actual: uniqueActiveCount,
+      limit: constraints.maxAssets,
+      note: maxAssetsNote,
+    },
+    weightBounds: {
+      passed: weightViolations.length === 0,
+      min: constraints.minAssetWeight,
+      max: constraints.maxAssetWeight,
+      violations: weightViolations,
+    },
+    classCaps: { passed: classCapViolations.length === 0, violations: classCapViolations },
+  };
+}
+
 export function buildPortfolioRecommendation(
   holdings: Holdings,
   prices: Prices,
   benchmark: Benchmark,
   constraints: Constraints,
+  dataWarnings: DataWarning[] = [],
 ): PortfolioRecommendation {
   const metrics = calculateMetrics(holdings, prices, benchmark);
   const proposedWeights = proposedWeightsFromScores(metrics);
@@ -146,6 +210,7 @@ export function buildPortfolioRecommendation(
 
       return {
         assetId: metric.asset.assetId,
+        isin: metric.asset.isin,
         ticker: metric.asset.ticker,
         name: metric.asset.name,
         sector: metric.asset.sector,
@@ -170,6 +235,8 @@ export function buildPortfolioRecommendation(
     })),
   );
 
+  const constraintCompliance = computeConstraintCompliance(rows, constraints, sectorExposures);
+
   return {
     asOf: holdings.asOf,
     currency: holdings.currency,
@@ -179,6 +246,8 @@ export function buildPortfolioRecommendation(
     benchmarkName: benchmark.name,
     benchmarkMonthlyReturns,
     assetMonthlyReturns,
+    dataWarnings,
+    constraintCompliance,
     summary: {
       expectedMonthlyReturn: weightedAverage(
         metrics,

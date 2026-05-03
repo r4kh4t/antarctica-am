@@ -14,7 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { AssetMonthlyReturn } from "@/lib/portfolio/types";
+import type { AssetMonthlyReturn, RecommendationRow } from "@/lib/portfolio/types";
 import { RECHARTS_INITIAL_DIMENSION } from "@/components/chart/rechartsSizing";
 
 const LINE_COLORS = [
@@ -31,6 +31,13 @@ const LINE_COLORS = [
 ];
 
 const BENCHMARK_COLOR = "#1F2528";
+const CURRENT_PORTFOLIO_COLOR = "#F59E0B";
+const RECOMMENDED_PORTFOLIO_COLOR = "#10B981";
+
+// Special series keys
+const KEY_BENCHMARK = "__benchmark";
+const KEY_CURRENT = "__current_portfolio";
+const KEY_RECOMMENDED = "__recommended_portfolio";
 
 function formatMonthLabel(month: string): string {
   if (!month || month.length < 7) return "";
@@ -38,9 +45,6 @@ function formatMonthLabel(month: string): string {
   const year = parseInt(yearStr ?? "", 10);
   const mon = parseInt(monthStr ?? "", 10);
   if (isNaN(year) || isNaN(mon) || mon < 1 || mon > 12) return month;
-  // Local date constructor (midnight local time) avoids the UTC→local timezone
-  // shift that parseISO would introduce for a UTC midnight date (e.g. UTC-12
-  // would roll back one day making April become March).
   return format(new Date(year, mon - 1, 1), "MMM ''yy");
 }
 
@@ -48,17 +52,11 @@ type PerformanceChartProps = {
   assetMonthlyReturns: AssetMonthlyReturn[];
   benchmarkMonthlyReturns: { month: string; return: number }[];
   benchmarkName: string;
+  /** Recommendation rows; if omitted the Current/Recommended aggregate lines will simply stay flat at 100. */
+  rows?: RecommendationRow[];
 };
 
-// ─── Fund selector dropdown ────────────────────────────────────────────────
-
-type FundSelectProps = {
-  tickers: string[];
-  benchmarkName: string;
-  tickerColorMap: Record<string, string>;
-  hiddenSeries: Set<string>;
-  onToggle: (key: string) => void;
-};
+// ─── Shared icons ────────────────────────────────────────────────────────────
 
 function CheckIcon() {
   return (
@@ -82,6 +80,79 @@ function ChevronDown({ open }: { open: boolean }) {
   );
 }
 
+// ─── Reusable row inside a dropdown ──────────────────────────────────────────
+
+function DropdownRow({
+  active,
+  onClick,
+  legend,
+  label,
+  sublabel,
+}: {
+  active: boolean;
+  onClick: () => void;
+  legend: React.ReactNode;
+  label: string;
+  sublabel?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center gap-2.5 px-3 py-1.5 text-sm transition-colors hover:bg-surface"
+    >
+      <span className="shrink-0">{legend}</span>
+      <span className={`flex-1 text-left ${active ? "text-ink" : "text-secondary/40"}`}>
+        {label}
+        {sublabel && (
+          <span className="block text-[10px] text-secondary/40 leading-tight">{sublabel}</span>
+        )}
+      </span>
+      <span
+        className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border ${
+          active ? "border-ink bg-ink" : "border-border bg-white"
+        }`}
+      >
+        {active && <CheckIcon />}
+      </span>
+    </button>
+  );
+}
+
+function LineLegend({
+  color,
+  dashed = false,
+  active,
+}: {
+  color: string;
+  dashed?: boolean;
+  active: boolean;
+}) {
+  return (
+    <svg width="16" height="8" className="shrink-0">
+      <line
+        x1="0"
+        y1="4"
+        x2="16"
+        y2="4"
+        stroke={active ? color : "#d8d8d2"}
+        strokeWidth="2"
+        strokeDasharray={dashed ? "4 2" : undefined}
+      />
+    </svg>
+  );
+}
+
+// ─── Fund selector dropdown ───────────────────────────────────────────────────
+
+type FundSelectProps = {
+  tickers: string[];
+  benchmarkName: string;
+  tickerColorMap: Record<string, string>;
+  hiddenSeries: Set<string>;
+  onToggle: (key: string) => void;
+};
+
 function FundSelect({
   tickers,
   benchmarkName,
@@ -101,7 +172,7 @@ function FundSelect({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const allKeys = [...tickers, "__benchmark"];
+  const allKeys = [KEY_BENCHMARK, ...tickers];
   const visibleCount = allKeys.filter((k) => !hiddenSeries.has(k)).length;
 
   const summaryLabel =
@@ -116,7 +187,6 @@ function FundSelect({
       if (hiddenSeries.has(k)) onToggle(k);
     }
   }
-
   function hideAll() {
     for (const k of allKeys) {
       if (!hiddenSeries.has(k)) onToggle(k);
@@ -136,7 +206,6 @@ function FundSelect({
 
       {open && (
         <div className="absolute left-0 top-full z-50 mt-1.5 w-60 overflow-hidden rounded-2xl border border-border bg-white shadow-xl">
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-3 py-2">
             <span className="text-xs font-semibold uppercase tracking-label-sm text-secondary/55">
               Series
@@ -151,76 +220,39 @@ function FundSelect({
             </div>
           </div>
 
-          {/* Fund rows */}
-          <div className="max-h-56 overflow-y-auto py-1">
-            {tickers.map((ticker) => {
-              const active = !hiddenSeries.has(ticker);
-              const color = tickerColorMap[ticker] ?? "#888";
-              return (
-                <button
-                  key={ticker}
-                  type="button"
-                  onClick={() => onToggle(ticker)}
-                  className="flex w-full items-center gap-2.5 px-3 py-1.5 text-sm transition-colors hover:bg-surface"
-                >
-                  <svg width="16" height="8" className="shrink-0">
-                    <line
-                      x1="0"
-                      y1="4"
-                      x2="16"
-                      y2="4"
-                      stroke={active ? color : "#d8d8d2"}
-                      strokeWidth="2"
-                    />
-                  </svg>
-                  <span className={`flex-1 text-left ${active ? "text-ink" : "text-secondary/40"}`}>
-                    {ticker}
-                  </span>
-                  <span
-                    className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border ${
-                      active ? "border-ink bg-ink" : "border-border bg-white"
-                    }`}
-                  >
-                    {active && <CheckIcon />}
-                  </span>
-                </button>
-              );
-            })}
-
-            {/* Benchmark divider + row */}
-            <div className="mx-3 my-1 border-t border-border" />
-            <button
-              type="button"
-              onClick={() => onToggle("__benchmark")}
-              className="flex w-full items-center gap-2.5 px-3 py-1.5 text-sm transition-colors hover:bg-surface"
-            >
-              <svg width="16" height="8" className="shrink-0">
-                <line
-                  x1="0"
-                  y1="4"
-                  x2="16"
-                  y2="4"
-                  stroke={!hiddenSeries.has("__benchmark") ? BENCHMARK_COLOR : "#d8d8d2"}
-                  strokeWidth="2"
-                  strokeDasharray="4 2"
+          <div className="max-h-64 overflow-y-auto py-1">
+            {/* Benchmark — always first */}
+            <DropdownRow
+              active={!hiddenSeries.has(KEY_BENCHMARK)}
+              onClick={() => onToggle(KEY_BENCHMARK)}
+              legend={
+                <LineLegend
+                  color={BENCHMARK_COLOR}
+                  dashed
+                  active={!hiddenSeries.has(KEY_BENCHMARK)}
                 />
-              </svg>
-              <span
-                className={`flex-1 truncate text-left text-xs ${
-                  !hiddenSeries.has("__benchmark") ? "text-ink" : "text-secondary/40"
-                }`}
-                title={benchmarkName}
-              >
-                Benchmark
-              </span>
-              <span
-                className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border ${
-                  !hiddenSeries.has("__benchmark") ? "border-ink bg-ink" : "border-border bg-white"
-                }`}
-              >
-                {!hiddenSeries.has("__benchmark") && <CheckIcon />}
-              </span>
-            </button>
+              }
+              label="Benchmark"
+              sublabel={benchmarkName.length > 30 ? benchmarkName.slice(0, 28) + "…" : undefined}
+            />
+
+            <div className="mx-3 my-1 border-t border-border" />
+
+            {/* Individual fund tickers */}
+            {tickers.map((ticker) => (
+              <DropdownRow
+                key={ticker}
+                active={!hiddenSeries.has(ticker)}
+                onClick={() => onToggle(ticker)}
+                legend={
+                  <LineLegend
+                    color={tickerColorMap[ticker] ?? "#888"}
+                    active={!hiddenSeries.has(ticker)}
+                  />
+                }
+                label={ticker}
+              />
+            ))}
           </div>
         </div>
       )}
@@ -228,7 +260,98 @@ function FundSelect({
   );
 }
 
-// ─── Month range picker
+// ─── Portfolio series dropdown ────────────────────────────────────────────────
+
+type PortfolioSelectProps = {
+  hiddenSeries: Set<string>;
+  onToggle: (key: string) => void;
+  benchmarkName: string;
+};
+
+const PORTFOLIO_SERIES = [
+  {
+    key: KEY_BENCHMARK,
+    label: "Benchmark",
+    color: BENCHMARK_COLOR,
+    dashed: true,
+  },
+  {
+    key: KEY_CURRENT,
+    label: "Current Portfolio",
+    sublabel: "Weighted at current weights",
+    color: CURRENT_PORTFOLIO_COLOR,
+    dashed: false,
+  },
+  {
+    key: KEY_RECOMMENDED,
+    label: "Recommended",
+    sublabel: "Weighted at recommended weights",
+    color: RECOMMENDED_PORTFOLIO_COLOR,
+    dashed: false,
+  },
+] as const;
+
+function PortfolioSelect({ hiddenSeries, onToggle }: PortfolioSelectProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const visibleCount = PORTFOLIO_SERIES.filter((s) => !hiddenSeries.has(s.key)).length;
+
+  const summaryLabel =
+    visibleCount === PORTFOLIO_SERIES.length
+      ? `All (${PORTFOLIO_SERIES.length})`
+      : visibleCount === 0
+        ? "None"
+        : `${visibleCount} of ${PORTFOLIO_SERIES.length}`;
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-medium text-secondary shadow-sm transition-colors hover:bg-surface"
+      >
+        <span>Portfolio: {summaryLabel}</span>
+        <ChevronDown open={open} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1.5 w-64 overflow-hidden rounded-2xl border border-border bg-white shadow-xl">
+          <div className="border-b border-border px-3 py-2">
+            <span className="text-xs font-semibold uppercase tracking-label-sm text-secondary/55">
+              Aggregated Series
+            </span>
+          </div>
+          <div className="py-1">
+            {PORTFOLIO_SERIES.map((s) => (
+              <DropdownRow
+                key={s.key}
+                active={!hiddenSeries.has(s.key)}
+                onClick={() => onToggle(s.key)}
+                legend={
+                  <LineLegend color={s.color} dashed={s.dashed} active={!hiddenSeries.has(s.key)} />
+                }
+                label={s.label}
+                sublabel={"sublabel" in s ? s.sublabel : undefined}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Month range picker ───────────────────────────────────────────────────────
 
 const MONTHS_ABBR = [
   "Jan",
@@ -259,7 +382,6 @@ function MonthRangePicker({
   onEndChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  // null = no pending start yet; string = first click done, waiting for end click
   const [pendingStart, setPendingStart] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -287,7 +409,6 @@ function MonthRangePicker({
     return Array.from({ length: max - min + 1 }, (_, i) => min + i);
   }, [availableMonths]);
 
-  // Range to highlight: uses hover preview while selecting the end
   const effectiveStart = pendingStart ?? start;
   const effectiveEnd = pendingStart && hovered ? hovered : end;
   const [rangeMin, rangeMax] =
@@ -330,8 +451,7 @@ function MonthRangePicker({
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1.5 w-[420px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-white shadow-xl">
-          {/* Header */}
+        <div className="absolute left-0 top-full z-50 mt-1.5 w-105 max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
             <span className="text-xs font-semibold uppercase tracking-label-sm text-secondary/60">
               {hint}
@@ -354,7 +474,6 @@ function MonthRangePicker({
             </div>
           </div>
 
-          {/* Year × month grid */}
           <div className="p-3">
             <div className="mb-1.5 grid grid-cols-[2.5rem_repeat(12,1fr)] gap-0.5 text-center">
               <div />
@@ -383,7 +502,7 @@ function MonthRangePicker({
                         className="group relative flex h-7 cursor-not-allowed items-center justify-center rounded bg-surface text-xs text-secondary/25"
                       >
                         {String(idx + 1).padStart(2, "0")}
-                        <span className="pointer-events-none absolute bottom-full left-1/2 z-[60] mb-1.5 hidden w-40 -translate-x-1/2 rounded-xl bg-ink px-2.5 py-2 text-xs leading-snug text-white shadow-lg group-hover:block">
+                        <span className="pointer-events-none absolute bottom-full left-1/2 z-60 mb-1.5 hidden w-40 -translate-x-1/2 rounded-xl bg-ink px-2.5 py-2 text-xs leading-snug text-white shadow-lg group-hover:block">
                           No price data for this period
                           <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-ink" />
                         </span>
@@ -419,15 +538,14 @@ function MonthRangePicker({
   );
 }
 
-// ─── Main component
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export function PerformanceChart({
   assetMonthlyReturns,
   benchmarkMonthlyReturns,
   benchmarkName,
+  rows = [],
 }: PerformanceChartProps) {
-  // allMonths is fully data-driven: adding more daily prices adds more monthly
-  // return rows, which extends allMonths and the date-range picker bounds automatically.
   const allMonths = useMemo(() => {
     const months = new Set([
       ...assetMonthlyReturns.map((r) => r.month),
@@ -441,12 +559,10 @@ export function PerformanceChart({
     [assetMonthlyReturns],
   );
 
-  // Derived defaults — empty string means "user hasn't changed it; fall back to data boundary"
   const firstMonth = allMonths[0] || "";
   const lastMonth = allMonths[allMonths.length - 1] || "";
   const [userStartMonth, setUserStartMonth] = useState<string>("");
   const [userEndMonth, setUserEndMonth] = useState<string>("");
-  // || treats "" as "not set", so the pickers always show the full available range by default
   const startMonth = userStartMonth || firstMonth;
   const endMonth = userEndMonth || lastMonth;
 
@@ -465,41 +581,76 @@ export function PerformanceChart({
   const chartData = useMemo(() => {
     if (filteredMonths.length === 0) return [];
 
+    // Index returns by ticker for individual fund lines
     const returnsByTicker = new Map<string, Map<string, number>>();
     for (const row of assetMonthlyReturns) {
       if (!returnsByTicker.has(row.ticker)) returnsByTicker.set(row.ticker, new Map());
       returnsByTicker.get(row.ticker)!.set(row.month, row.return);
     }
+
+    // Index returns by assetId for portfolio aggregates
+    const returnsByAssetId = new Map<string, Map<string, number>>();
+    for (const row of assetMonthlyReturns) {
+      if (!returnsByAssetId.has(row.assetId)) returnsByAssetId.set(row.assetId, new Map());
+      returnsByAssetId.get(row.assetId)!.set(row.month, row.return);
+    }
+
     const benchmarkByMonth = new Map(benchmarkMonthlyReturns.map((r) => [r.month, r.return]));
 
     const cumulative: Record<string, number> = {};
     for (const ticker of tickers) cumulative[ticker] = 100;
-    cumulative["__benchmark"] = 100;
+    cumulative[KEY_BENCHMARK] = 100;
+    cumulative[KEY_CURRENT] = 100;
+    cumulative[KEY_RECOMMENDED] = 100;
 
-    // "Start" avoids a long duplicate label like "Base (Apr '23)" in the X-axis
     const basePoint: Record<string, number | string> = { month: "Start" };
     for (const ticker of tickers) basePoint[ticker] = 100;
-    basePoint["__benchmark"] = 100;
+    basePoint[KEY_BENCHMARK] = 100;
+    basePoint[KEY_CURRENT] = 100;
+    basePoint[KEY_RECOMMENDED] = 100;
 
     const result: Record<string, number | string>[] = [basePoint];
 
     for (const month of filteredMonths) {
       const point: Record<string, number | string> = { month: formatMonthLabel(month) };
+
+      // Individual tickers
       for (const ticker of tickers) {
         const r = returnsByTicker.get(ticker)?.get(month) ?? 0;
         cumulative[ticker] = parseFloat((cumulative[ticker]! * (1 + r)).toFixed(3));
         point[ticker] = cumulative[ticker];
       }
+
+      // Benchmark
       const benchR = benchmarkByMonth.get(month) ?? 0;
-      cumulative["__benchmark"] = parseFloat(
-        (cumulative["__benchmark"]! * (1 + benchR)).toFixed(3),
+      cumulative[KEY_BENCHMARK] = parseFloat(
+        (cumulative[KEY_BENCHMARK]! * (1 + benchR)).toFixed(3),
       );
-      point["__benchmark"] = cumulative["__benchmark"];
+      point[KEY_BENCHMARK] = cumulative[KEY_BENCHMARK];
+
+      // Current portfolio aggregate (weighted sum of returns at current weights)
+      const currentR = rows.reduce((sum, row) => {
+        const r = returnsByAssetId.get(row.assetId)?.get(month) ?? 0;
+        return sum + row.currentWeight * r;
+      }, 0);
+      cumulative[KEY_CURRENT] = parseFloat((cumulative[KEY_CURRENT]! * (1 + currentR)).toFixed(3));
+      point[KEY_CURRENT] = cumulative[KEY_CURRENT];
+
+      // Recommended portfolio aggregate
+      const recommendedR = rows.reduce((sum, row) => {
+        const r = returnsByAssetId.get(row.assetId)?.get(month) ?? 0;
+        return sum + row.recommendedWeight * r;
+      }, 0);
+      cumulative[KEY_RECOMMENDED] = parseFloat(
+        (cumulative[KEY_RECOMMENDED]! * (1 + recommendedR)).toFixed(3),
+      );
+      point[KEY_RECOMMENDED] = cumulative[KEY_RECOMMENDED];
+
       result.push(point);
     }
 
     return result;
-  }, [filteredMonths, tickers, assetMonthlyReturns, benchmarkMonthlyReturns]);
+  }, [filteredMonths, tickers, assetMonthlyReturns, benchmarkMonthlyReturns, rows]);
 
   function toggleSeries(key: string) {
     setHiddenSeries((prev) => {
@@ -513,7 +664,7 @@ export function PerformanceChart({
   return (
     <div className="flex flex-col gap-4">
       {/* Controls row */}
-      <div className="flex flex-wrap items-end gap-4">
+      <div className="flex flex-wrap items-end gap-3">
         {/* Date range picker */}
         <div>
           <p className="mb-1.5 text-xs font-semibold uppercase tracking-label-sm text-secondary/60">
@@ -528,7 +679,19 @@ export function PerformanceChart({
           />
         </div>
 
-        {/* Fund selector */}
+        {/* Portfolio series selector */}
+        <div>
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-label-sm text-secondary/60">
+            Portfolio
+          </p>
+          <PortfolioSelect
+            hiddenSeries={hiddenSeries}
+            onToggle={toggleSeries}
+            benchmarkName={benchmarkName}
+          />
+        </div>
+
+        {/* Individual fund selector */}
         <div>
           <p className="mb-1.5 text-xs font-semibold uppercase tracking-label-sm text-secondary/60">
             Funds
@@ -562,9 +725,7 @@ export function PerformanceChart({
           initialDimension={RECHARTS_INITIAL_DIMENSION}
         >
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-            {/* Green: above 100 — capital growth */}
             <ReferenceArea y1={100} y2={999} fill="#10B981" fillOpacity={0.13} />
-            {/* Amber: below 100 — capital at risk */}
             <ReferenceArea y1={1} y2={100} fill="#F59E0B" fillOpacity={0.16} />
 
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e0" />
@@ -587,14 +748,23 @@ export function PerformanceChart({
             />
             <ReferenceLine y={100} stroke="#9ca3af" strokeDasharray="4 2" />
             <Tooltip
-              formatter={(value, name) => [
-                `${Number(value).toFixed(1)}`,
-                name === "__benchmark" ? "Benchmark" : String(name),
-              ]}
+              formatter={(value, name) => {
+                const label =
+                  name === KEY_BENCHMARK
+                    ? "Benchmark"
+                    : name === KEY_CURRENT
+                      ? "Current Portfolio"
+                      : name === KEY_RECOMMENDED
+                        ? "Recommended"
+                        : String(name);
+                return [`${Number(value).toFixed(1)}`, label];
+              }}
               labelStyle={{ fontWeight: 600, marginBottom: 4 }}
               contentStyle={{ fontSize: 12, borderRadius: 12, border: "1px solid #d8d8d2" }}
               wrapperStyle={{ zIndex: 40 }}
             />
+
+            {/* Individual fund lines */}
             {tickers.map((ticker) => (
               <Line
                 key={ticker}
@@ -607,16 +777,42 @@ export function PerformanceChart({
                 activeDot={{ r: 4 }}
               />
             ))}
+
+            {/* Benchmark */}
             <Line
               type="monotone"
-              dataKey="__benchmark"
-              name={benchmarkName}
+              dataKey={KEY_BENCHMARK}
+              name="Benchmark"
               stroke={BENCHMARK_COLOR}
               strokeWidth={2}
               strokeDasharray="5 3"
               dot={false}
-              hide={hiddenSeries.has("__benchmark")}
+              hide={hiddenSeries.has(KEY_BENCHMARK)}
               activeDot={{ r: 4 }}
+            />
+
+            {/* Current portfolio aggregate */}
+            <Line
+              type="monotone"
+              dataKey={KEY_CURRENT}
+              name="Current Portfolio"
+              stroke={CURRENT_PORTFOLIO_COLOR}
+              strokeWidth={2.5}
+              dot={false}
+              hide={hiddenSeries.has(KEY_CURRENT)}
+              activeDot={{ r: 5 }}
+            />
+
+            {/* Recommended portfolio aggregate */}
+            <Line
+              type="monotone"
+              dataKey={KEY_RECOMMENDED}
+              name="Recommended"
+              stroke={RECOMMENDED_PORTFOLIO_COLOR}
+              strokeWidth={2.5}
+              dot={false}
+              hide={hiddenSeries.has(KEY_RECOMMENDED)}
+              activeDot={{ r: 5 }}
             />
           </LineChart>
         </ResponsiveContainer>

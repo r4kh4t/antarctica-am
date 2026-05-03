@@ -39,6 +39,7 @@ describe("portfolio constraints", () => {
   const assets: Asset[] = [
     {
       assetId: "EQ1",
+      isin: "EQ1",
       ticker: "EQ1",
       name: "Equity One",
       sector: "Equity",
@@ -47,6 +48,7 @@ describe("portfolio constraints", () => {
     },
     {
       assetId: "FI1",
+      isin: "FI1",
       ticker: "FI1",
       name: "Bond One",
       sector: "Fixed Income",
@@ -55,6 +57,7 @@ describe("portfolio constraints", () => {
     },
     {
       assetId: "ALT1",
+      isin: "ALT1",
       ticker: "ALT1",
       name: "Alt One",
       sector: "Alternatives",
@@ -63,6 +66,7 @@ describe("portfolio constraints", () => {
     },
     {
       assetId: "CAS",
+      isin: "CAS",
       ticker: "CAS",
       name: "Cash",
       sector: "Cash",
@@ -77,6 +81,7 @@ describe("portfolio constraints", () => {
     minAssetWeight: 0.05,
     maxAssetWeight: 0.45,
     maxTurnover: 0.2,
+    maxAssets: 10,
     notes: [],
     sectorBounds: [
       { sector: "Equity", min: 0.2, max: 0.4 },
