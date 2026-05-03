@@ -10,23 +10,12 @@ import { TextLineSkeleton } from "@/components/shared/Skeleton";
 import { Tooltip, InfoIcon } from "@/components/shared/Tooltip";
 import { InlineMarkdown } from "@/components/shared/InlineMarkdown";
 import { TableControls } from "./TableControls";
+import type { MoveFilter, SortDirection, SortKey } from "./types";
 
 type RecommendationTableProps = {
   recommendation: PortfolioRecommendation;
   aiState: AiState;
 };
-
-type SortKey =
-  | "ticker"
-  | "sector"
-  | "currentWeight"
-  | "recommendedWeight"
-  | "weightDelta"
-  | "riskAdjustedScore";
-
-type SortDirection = "asc" | "desc";
-
-type MoveFilter = "all" | "increase" | "reduce" | "hold";
 
 function getSortValue(row: RecommendationRow, key: SortKey) {
   return row[key];

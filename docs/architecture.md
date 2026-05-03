@@ -7,7 +7,7 @@ A focused Next.js 16 dashboard that reads portfolio data, calculates risk-adjust
 ## Data Flow
 
 ```
-data/actual/*.json
+data/*.json  (holdings, prices, benchmark, constraints)
   └─ src/lib/portfolio/actualData.ts    normalise author schema → internal types
        └─ src/lib/portfolio/data.ts     validate weights + uniqueness
        └─ src/lib/portfolio/monthlyReturns.ts   daily prices → month-end returns
@@ -16,7 +16,7 @@ data/actual/*.json
                       └─ src/components/dashboard/PortfolioDashboard.tsx  (client)
                            ├─ POST /api/rationale  → GPT-4o → AI commentary
                            ├─ src/components/table/RecommendationTable.tsx
-                           ├─ src/components/chart/WeightChart.tsx
+                           ├─ src/components/chart/AnalyticsSection.tsx
                            └─ src/components/dashboard/MethodologyCard.tsx
 ```
 
@@ -25,22 +25,23 @@ data/actual/*.json
 | Directory | Contents |
 |---|---|
 | `dashboard/` | `PortfolioDashboard` (central AI state), `MethodologyCard` |
-| `table/` | `RecommendationTable`, `TableControls` (filters + sort) |
-| `chart/` | `WeightChart` (server shell), `WeightChartContent` (client, no-SSR) |
-| `shared/` | `Skeleton`, `Tooltip`, `InlineMarkdown` |
+| `table/` | `RecommendationTable`, `TableControls` (filters + sort), `types.ts` (shared filter/sort types) |
+| `chart/` | `AnalyticsSection` (tab shell), `WeightChartContent`, `PerformanceChart`, `RiskReturnChart`, `SectorChart`, `rechartsSizing.ts` |
+| `shared/` | `Skeleton`, `Tooltip` + `InfoIcon`, `InlineMarkdown` |
 | `providers.tsx` | Client-only provider tree (`RollbarProvider`) |
 
 ## LLM Utilities (`src/lib/llm/`)
 
 | File | Purpose |
 |---|---|
-| `client.ts` | Base OpenAI singleton; model name & reasoning-model detection |
-| `observability.ts` | `observeOpenAI`-traced client (Langfuse); falls back to plain client if no credentials |
-| `instructor.ts` | Instructor-wrapped client for structured output + auto-retry |
+| `client.ts` | Model name & reasoning-model detection (`getModelName`, `isReasoningModel`) |
+| `observability.ts` | `getTracedOpenAIClient()` — `observeOpenAI`-traced singleton (Langfuse); falls back to plain client if no credentials |
+| `instructor.ts` | Instructor-wrapped traced client for structured output + auto-retry |
 | `schemas.ts` | Zod schema for LLM response validation |
-| `guardrails.ts` | Input validation (`validateRationaleRequest`) + output normalisation |
+| `guardrails.ts` | Input validation (`validateRationaleRequest`) + output normalisation (`normalizeRationaleResponse`) |
 | `formatters.ts` | Portfolio data → markdown tables (LLM input) |
 | `tokens.ts` | Token estimation, context window guard (`assertFitsContext`) |
+| `cache.ts` | In-process rationale cache (SHA-256 key, 1-hour TTL) |
 | `prompts/rationale.ts` | Versioned system prompt (`PROMPT_VERSION`) |
 
 ## API Route
@@ -49,6 +50,7 @@ data/actual/*.json
 
 - Standard models (GPT-4o): Instructor + Zod → structured, validated, auto-retried output
 - Reasoning models (o-series): direct OpenAI call + manual `RationaleResponseSchema.parse()`
+- Cache: SHA-256 keyed on portfolio state; 1-hour TTL; `cached: true` flag in response body
 - After response: `langfuseSpanProcessor.forceFlush()` ensures traces reach Langfuse in serverless
 - On error: `captureServerError()` sends the exception to Rollbar (if configured)
 
@@ -71,6 +73,6 @@ data/actual/*.json
 
 - **Static page** — all data is local and deterministic; no database or auth needed.
 - **Server-side calculation** — portfolio math stays in plain TypeScript functions, not React hooks; keeps it testable and out of the browser bundle.
-- **No-SSR chart** — Recharts needs browser layout measurement; `WeightChartContent` is dynamically imported with `ssr: false`.
+- **Recharts sizing** — `RECHARTS_INITIAL_DIMENSION` provides positive initial dimensions to suppress the first-paint "width/height ≤ 0" warning from `ResponsiveContainer`; no dynamic import needed.
 - **Explainable method** — risk-adjusted scoring with transparent constraint handling beats a black-box optimiser for a stakeholder debrief.
 - **Graceful degradation** — missing API keys (OpenAI, Langfuse, Rollbar) all degrade gracefully; the dashboard is always functional.

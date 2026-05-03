@@ -9,17 +9,99 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.7.1] — 2026-05-03
+
+### Added
+
+- `actualData.ts`: four Zod schemas (`RawHoldingSchema`, `RawPriceRowSchema`, `RawBenchmarkLevelSchema`, `RawConstraintFileSchema`) validate the raw JSON inputs at load time. Replaces the previous `as` casts — a shape mismatch now surfaces a typed `ZodError` with a precise field path instead of a silent runtime failure downstream. Types for `RawHolding`, `RawPriceRow`, `RawConstraintFile` are now inferred from the schemas via `z.infer<>`. Closes #38.
+
+## [1.7.0] — 2026-05-03
+
+### Fixed
+
+- `src/lib/llm/client.ts`: removed dead `getOpenAIClient` export — nothing imported it; callers should use `getTracedOpenAIClient` or `getInstructorClient`.
+- `src/lib/constants.ts`: removed dead `AiStatus` type export — only `AI_STATUS` (value) and `AiState` (union type) are consumed.
+- `src/lib/portfolio/actualData.ts`: benchmark level dates now go through `normalizeDateString` for consistent `asOf` calculation and month alignment with the price series.
+- `src/app/api/rationale/route.ts`: replaced `result!` non-null assertion (which TypeScript couldn't narrow across the two model branches) with an IIFE that returns a typed `{ result, totalTokens }` object.
+- `docs/architecture.md`: removed deleted `WeightChart.tsx` references; updated component table and data-flow diagram to match current code; added cache and analytics entries.
+- `.cursor/rules/llm-integration.mdc`: corrected `getOpenAIClient` → `getTracedOpenAIClient`/`getInstructorClient`; corrected `validateRationaleResponse` → `normalizeRationaleResponse`; corrected `traceLLMCall`/`langfuse.ts` → `observeOpenAI`/`observability.ts`.
+- `docs/development-workflow.md`: test count updated from 38 → 48; added `skip-changelog` label bypass note.
+- `docs/ai-workflow.md`: fixed `.cursor/hooks/hooks.json` path → `.cursor/hooks.json` + `.cursor/hooks/`.
+
+### Added
+
+- `src/components/table/types.ts`: extracted `SortKey`, `SortDirection`, `MoveFilter` from `RecommendationTable.tsx` and `TableControls.tsx` (duplicate definitions) into one shared file.
+- `README.md`: **Next Steps** section listing open GitHub issues aligned with audit findings.
+- GitHub issues [#37](https://github.com/r4kh4t/antarctica-am-draft/issues/37), [#38](https://github.com/r4kh4t/antarctica-am-draft/issues/38), [#39](https://github.com/r4kh4t/antarctica-am-draft/issues/39) — guardrails gap, Zod input validation, and a11y tooltip fix.
+
+## [1.6.7] — 2026-05-03
+
+### Added
+
+- `PerformanceChart`: replaced two separate month dropdowns with a single `MonthRangePicker` — a two-click range selector showing a year × month grid; months with no price data are greyed out with a CSS hover tooltip explaining why; a `?` InfoIcon in the panel header shows the same explanation via the shared `HoverTooltip`.
+- `PortfolioDashboard`: footer with year (2026), author name, and contact email `rahateamfor@gmail.com`.
+
+## [1.6.6] — 2026-05-03
+
+### Added
+
+- `date-fns` dependency for consistent date parsing and formatting.
+
+### Changed
+
+- `actualData.ts` / `normalizeInputDate`: `DD/MM/YYYY` entries now parsed with `date-fns` `parse` + `format` instead of manual string splitting; Excel serial and ISO datetime cases retain their string-slice approach to avoid UTC→local timezone shifts.
+- `PerformanceChart` / `formatMonthLabel`: replaced hand-rolled month-name array with `date-fns` `format(new Date(year, mon-1, 1), "MMM ''yy")`; uses local-date constructor to avoid UTC midnight timezone roll-back.
+
+## [1.6.5] — 2026-05-03
+
+### Fixed
+
+- `actualData.ts` / `normalizeInputDate`: handles all four date formats found in `prices_actual.json` — ISO date (`YYYY-MM-DD`), ISO datetime with TZ (`YYYY-MM-DDTHH:MM:SSZ`), Excel serial, and `DD/MM/YYYY`. Previously, the latter two were passed through unchanged, producing garbage month keys like `"28/07/2"` and garbled X-axis labels.
+- `PerformanceChart` / `formatMonthLabel`: validates input is well-formed `YYYY-MM` before formatting; returns the raw string instead of `"undefined '/07/2..."` on malformed input.
+
+### Changed
+
+- `PerformanceChart`: removed "Above 100 — capital growth / Below 100 — capital at risk / Baseline (100)" zone legend (background colours remain in the chart).
+
+### Removed
+
+- `src/components/chart/WeightChart.tsx`: dead code — `WeightChartContent` is now used directly everywhere; wrapper component was never imported outside of the barrel file.
+- `src/components/chart/index.ts`: removed `WeightChart` re-export.
+
+## [1.6.4] — 2026-05-03
+
+### Changed
+
+- `README.md`: "Recommendation method" section rewritten with a full one-paragraph rationale and a decision table (objective, return definition, missing data, constraints, cardinality).
+- `AGENTS.md`: new `## Optimisation rationale` section with the same paragraph for AI-assisted work context.
+- `.cursor/rules/portfolio-domain.mdc`: rationale paragraph added at the top; last rule now requires updating all three locations when the scoring method changes.
+
+## [1.6.3] — 2026-05-03
+
+### Changed
+
+- `PortfolioDashboard`: Decision Summary items now each have an `InfoIcon` tooltip explaining the metric; removed the duplicate KPI card row that repeated the same numbers.
+- `PortfolioDashboard`: Allocation chart and Sector-exposure constraints merged into one combined card; Methodology is a standalone card beside it — replaces the previous two-level nested grid that left excess whitespace.
+- `MethodologyCard`: simplified to render only the dark methodology panel; constraints panel moved into `PortfolioDashboard`.
+
+## [1.6.2] — 2026-05-03
+
+### Fixed
+
+- Recharts: set `initialDimension`, `minWidth={0}`, and `minHeight` on `ResponsiveContainer` plus `min-w-0` / `min-h-0` chart shells so first paint/SSR no longer logs negative width/height.
+- `PortfolioDashboard` header: `Image` logo uses `h-12 w-auto` to satisfy Next.js aspect-ratio warning when constraining one dimension.
+
 ## [1.6.1] — 2026-05-03
 
 ### Changed
 
-- `AGENTS.md`: restore concise, production-style guidance for AI-assisted work; update data path note for `data/actual/`.
+- `AGENTS.md`: restore concise, production-style guidance for AI-assisted work.
 
 ## [1.6.0] — 2026-05-03
 
 ### Added
 
-- `src/lib/portfolio/actualData.ts`: loads `data/actual/*`, maps the author JSON schema to internal portfolio types, coerces Excel serial dates and string prices, renormalises weights, duplicates shared-ISIN price rows per holdings line.
+- `src/lib/portfolio/actualData.ts`: loads `data/*`, maps the author JSON schema to internal portfolio types, coerces Excel serial dates and string prices, renormalises weights, duplicates shared-ISIN price rows per holdings line.
 
 ### Changed
 

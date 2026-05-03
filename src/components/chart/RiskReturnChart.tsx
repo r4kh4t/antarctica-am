@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { formatPercent } from "@/lib/portfolio/format";
 import type { RecommendationRow } from "@/lib/portfolio/types";
+import { RECHARTS_INITIAL_DIMENSION } from "@/components/chart/rechartsSizing";
 
 // Colors assigned per sector (deterministic from sorted sector list)
 const SECTOR_PALETTE = [
@@ -31,6 +32,7 @@ type RiskReturnChartProps = {
 };
 
 type ScatterPoint = {
+  assetId: string;
   ticker: string;
   name: string;
   sector: string;
@@ -72,6 +74,7 @@ export function RiskReturnChart({ rows }: RiskReturnChartProps) {
   );
 
   const scatterData: ScatterPoint[] = rows.map((row) => ({
+    assetId: row.assetId,
     ticker: row.ticker,
     name: row.name,
     sector: row.sector,
@@ -100,8 +103,14 @@ export function RiskReturnChart({ rows }: RiskReturnChartProps) {
       </div>
 
       {/* Scatter chart */}
-      <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-72 min-h-0 w-full min-w-0">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={288}
+          initialDimension={RECHARTS_INITIAL_DIMENSION}
+        >
           <ScatterChart margin={{ top: 8, right: 24, left: 0, bottom: 16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e0" />
             <XAxis
@@ -138,10 +147,14 @@ export function RiskReturnChart({ rows }: RiskReturnChartProps) {
             />
             {/* Bubble size encodes recommended weight */}
             <ZAxis type="number" dataKey="recommendedWeight" range={[40, 320]} />
-            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: "3 3" }} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ strokeDasharray: "3 3" }}
+              wrapperStyle={{ zIndex: 40 }}
+            />
             <Scatter data={scatterData} fillOpacity={0.85}>
               {scatterData.map((entry) => (
-                <Cell key={entry.ticker} fill={entry.sectorColor} />
+                <Cell key={entry.assetId} fill={entry.sectorColor} />
               ))}
             </Scatter>
           </ScatterChart>

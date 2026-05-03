@@ -4,7 +4,7 @@
 
 ```bash
 npm run dev            # start dev server on http://localhost:3000
-npm test               # run all 38 unit tests (Vitest)
+npm test               # run all 48 unit tests (Vitest)
 npm run test:watch     # watch mode
 npm run lint           # ESLint
 npm run format:check   # Biome formatting check (read-only)
@@ -65,7 +65,7 @@ All notable changes are recorded in `CHANGELOG.md` at the project root, followin
 - Internal refactors and tooling changes (`chore`, `ci`, `style`) may skip it.
 
 **Enforcement:**  
-The GitHub Actions CI workflow (`.github/workflows/ci.yml`) fails on PRs to `main` or `develop` if `CHANGELOG.md` was not modified. See the CI workflow for details.
+The GitHub Actions CI workflow (`.github/workflows/ci.yml`) fails on PRs to `main` or `develop` if `CHANGELOG.md` was not modified. PRs can bypass this check with the `skip-changelog` label (intended for lockfile-only or CI-config-only changes).
 
 ## CI / CD
 
@@ -83,7 +83,7 @@ Vercel deploys automatically on every push to `main`. See `docs/architecture.md`
 
 For the final submission, clean commits replay the development arc:
 
-1. Scaffold the app and generated fixture data
+1. Wire actual data (`data/actual/*.json`) and normalise to internal types
 2. Portfolio calculations and unit tests
 3. Dashboard UI with brand styling
 4. LLM rationale generation (GPT + Instructor + Zod)

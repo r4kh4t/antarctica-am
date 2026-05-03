@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { formatPercent } from "@/lib/portfolio/format";
 import type { SectorExposure } from "@/lib/portfolio/types";
+import { RECHARTS_INITIAL_DIMENSION } from "@/components/chart/rechartsSizing";
 
 const STATUS_COLOR: Record<SectorExposure["status"], string> = {
   within: "#10B981",
@@ -95,8 +96,14 @@ export function SectorChart({ sectorExposures }: SectorChartProps) {
         </div>
       </div>
 
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-64 min-h-0 w-full min-w-0">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={256}
+          initialDimension={RECHARTS_INITIAL_DIMENSION}
+        >
           <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e0" />
             <XAxis dataKey="sector" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
@@ -112,6 +119,7 @@ export function SectorChart({ sectorExposures }: SectorChartProps) {
                 name === "current" ? "Current" : "Recommended",
               ]}
               cursor={{ fill: "rgba(183, 213, 235, 0.24)" }}
+              wrapperStyle={{ zIndex: 40 }}
             />
             {/* Constraint range reference lines per bar — drawn via a second chart overlay trick
                 Recharts doesn't support per-bar reference areas, so we indicate status

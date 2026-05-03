@@ -16,8 +16,6 @@ export const AI_STATUS = {
   ERROR: "error",
 } as const;
 
-export type AiStatus = (typeof AI_STATUS)[keyof typeof AI_STATUS];
-
 /**
  * Discriminated union representing the lifecycle of the AI rationale fetch.
  * Defined here (not in a component) because it is consumed by multiple

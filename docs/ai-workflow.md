@@ -15,13 +15,13 @@ The assignment explicitly welcomes committed AI configuration. This repository i
 | `portfolio-domain.mdc` | Portfolio calculation conventions: month-end series, risk-adjusted scoring |
 | `llm-integration.mdc` | LLM architecture rules: prompt versioning, guardrails, token budget, Langfuse, Instructor/Zod |
 
-### Hooks (`.cursor/hooks/`)
+### Hooks
 
 | File | Purpose |
 |---|---|
-| `hooks.json` | Declares `beforeShellExecution` and `afterFileEdit` hooks |
-| `guard-risky-shell.mjs` | Prompts before destructive or irreversible shell commands |
-| `post-edit-reminder.mjs` | Reminds agents to run `npm run lint` / `npm test` after key file edits |
+| `.cursor/hooks.json` | Declares `beforeShellExecution` and `afterFileEdit` hooks |
+| `.cursor/hooks/guard-risky-shell.mjs` | Prompts before destructive or irreversible shell commands |
+| `.cursor/hooks/post-edit-reminder.mjs` | Reminds agents to run `npm run lint` / `npm test` after key file edits |
 
 ### Skills (`.cursor/skills/`)
 

@@ -48,18 +48,21 @@ export async function POST(req: NextRequest) {
       { role: "user" as const, content: userMessage },
     ];
 
-    let result: ReturnType<typeof RationaleResponseSchema.parse>;
-    let totalTokens = 0;
-
-    if (isReasoningModel(model)) {
-      // o-series models don't support JSON mode — parse + validate manually with Zod.
-      // The traced client automatically sends the generation to Langfuse.
-      const openai = getTracedOpenAIClient();
-      const completion = await openai.chat.completions.create({ model, messages });
-      const raw = completion.choices[0]?.message?.content ?? "";
-      totalTokens = completion.usage?.total_tokens ?? 0;
-      result = RationaleResponseSchema.parse(JSON.parse(raw));
-    } else {
+    // Run the appropriate model path and return a typed result.
+    // Extracting into a typed object eliminates the `result!` non-null assertion
+    // that TypeScript couldn't narrow across the two branches.
+    const { result, totalTokens } = await (async () => {
+      if (isReasoningModel(model)) {
+        // o-series models don't support JSON mode — parse + validate manually with Zod.
+        // The traced client automatically sends the generation to Langfuse.
+        const openai = getTracedOpenAIClient();
+        const completion = await openai.chat.completions.create({ model, messages });
+        const raw = completion.choices[0]?.message?.content ?? "";
+        return {
+          result: RationaleResponseSchema.parse(JSON.parse(raw)),
+          totalTokens: completion.usage?.total_tokens ?? 0,
+        };
+      }
       // GPT-4o and other standard models: Instructor handles Zod validation + retries.
       // The Instructor client wraps the traced OpenAI client, so Langfuse captures
       // every completion including retries.
@@ -70,9 +73,8 @@ export async function POST(req: NextRequest) {
         response_model: { schema: RationaleResponseSchema, name: "PortfolioRationale" },
         max_retries: 2,
       });
-
-      result = completion;
-    }
+      return { result: completion, totalTokens: 0 };
+    })();
 
     // Flush pending Langfuse spans after the response is sent (serverless-safe).
     // `after()` runs after the response is delivered, ensuring traces are not lost
@@ -81,7 +83,7 @@ export async function POST(req: NextRequest) {
       await langfuseSpanProcessor.forceFlush();
     });
 
-    const safe = normalizeRationaleResponse(result!, validated.rows);
+    const safe = normalizeRationaleResponse(result, validated.rows);
 
     const responseBody: RouteResponse = {
       ...safe,

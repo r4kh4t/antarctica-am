@@ -1,4 +1,3 @@
-export { WeightChart } from "./WeightChart";
 export { WeightChartContent } from "./WeightChartContent";
 export { AnalyticsSection } from "./AnalyticsSection";
 export { PerformanceChart } from "./PerformanceChart";

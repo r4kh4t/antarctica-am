@@ -7,7 +7,7 @@ description: Build or modify the Antarctica portfolio recommendation workflow. U
 
 ## Instructions
 
-1. Start from `data/actual/holdings_actual.json`, `prices_actual.json`, `benchmark_actual.json`, and `constraints_actual.json`, mapped in `src/lib/portfolio/actualData.ts`.
+1. Start from `data/holdings.json`, `prices.json`, `benchmark.json`, and `constraints.json`, mapped in `src/lib/portfolio/actualData.ts`.
 2. Convert daily prices and benchmark levels to month-end series before calculating returns.
 3. Score assets using risk-adjusted monthly performance, then tilt from current weights.
 4. Apply soft constraints after scoring: asset bounds, sector bounds, turnover, and total weight.

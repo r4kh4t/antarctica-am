@@ -1,70 +1,79 @@
-{
-  "asOf": "2025-09-30",
-  "currency": "GBP",
-  "assets": [
-    {
-      "assetId": "AAM-LGQ",
-      "ticker": "LGQ",
-      "name": "London Global Quality Equity",
-      "sector": "Global Equity",
-      "region": "Global",
-      "currentWeight": 0.18
-    },
-    {
-      "assetId": "AAM-USG",
-      "ticker": "USG",
-      "name": "US Growth Leaders",
-      "sector": "Global Equity",
-      "region": "North America",
-      "currentWeight": 0.14
-    },
-    {
-      "assetId": "AAM-EMD",
-      "ticker": "EMD",
-      "name": "Emerging Markets Debt",
-      "sector": "Fixed Income",
-      "region": "Emerging Markets",
-      "currentWeight": 0.12
-    },
-    {
-      "assetId": "AAM-IGC",
-      "ticker": "IGC",
-      "name": "Investment Grade Credit",
-      "sector": "Fixed Income",
-      "region": "Global",
-      "currentWeight": 0.16
-    },
-    {
-      "assetId": "AAM-INF",
-      "ticker": "INF",
-      "name": "Listed Infrastructure Income",
-      "sector": "Real Assets",
-      "region": "Global",
-      "currentWeight": 0.13
-    },
-    {
-      "assetId": "AAM-REI",
-      "ticker": "REI",
-      "name": "Defensive Real Estate Income",
-      "sector": "Real Assets",
-      "region": "Europe",
-      "currentWeight": 0.1
-    },
-    {
-      "assetId": "AAM-MAC",
-      "ticker": "MAC",
-      "name": "Macro Absolute Return",
-      "sector": "Alternatives",
-      "region": "Global",
-      "currentWeight": 0.09
-    },
-    {
-      "assetId": "AAM-CAS",
-      "ticker": "CAS",
-      "name": "Sterling Liquidity Reserve",
-      "sector": "Cash",
-      "region": "United Kingdom",
-      "currentWeight": 0.08
-    }
-  ]
-}
+[
+  {
+    "isin": "NTA001E0001",
+    "name": "NovaTech Inc",
+    "asset_class": "Equity",
+    "currency": "USD",
+    "weight": 0.12
+  },
+  {
+    "isin": "NTA002E0002",
+    "name": "Coralis Holdings",
+    "asset_class": "equity",
+    "currency": "USD",
+    "weight": 0.04
+  },
+  {
+    "isin": "NTA002E0002",
+    "name": "Coralis Group",
+    "asset_class": "Equity",
+    "currency": "USD",
+    "weight": 0.04
+  },
+  {
+    "isin": "NTA003E0003",
+    "name": "Kestrel Global",
+    "asset_class": "Equity",
+    "currency": "EUR",
+    "weight": 0.1
+  },
+  {
+    "isin": "NTA004E0004",
+    "name": "Aegis Partners",
+    "asset_class": "Equity",
+    "currency": "US$",
+    "weight": 0.08
+  },
+  {
+    "isin": "NTA005F0005",
+    "name": "Treasury 10Y Note",
+    "asset_class": "Fixed Income",
+    "currency": "USD",
+    "weight": 0.12
+  },
+  {
+    "isin": "NTA006F0006",
+    "name": "Corporate Bond Fund",
+    "asset_class": "fixed-income",
+    "currency": "USD",
+    "weight": 0.12
+  },
+  {
+    "isin": "NTA007F0007",
+    "name": "Municipal Bond ETF",
+    "asset_class": "FI",
+    "currency": "USD",
+    "weight": 0.11
+  },
+  {
+    "isin": "NTA008A0008",
+    "name": "Crescent Commodities Index",
+    "asset_class": "Alternatives",
+    "currency": "USD",
+    "weight": 0.09
+  },
+  {
+    "isin": "NTA009A0009",
+    "name": "Helio Real Assets",
+    "asset_class": "Alternatives",
+    "currency": "USD",
+    "weight": 0.08
+  },
+  {
+    "isin": "NTA010A0010",
+    "name": "Orion Hedge Fund",
+    "asset_class": "Alternatives",
+    "currency": "USD",
+    "weight": 0.08
+  }
+]

@@ -47,35 +47,42 @@ The project covers the code that is both easy to unit-test and most important to
 | `src/lib/llm/guardrails.test.ts` | `validateRationaleRequest` input validation, `normalizeRationaleResponse` | Prevents bad data reaching the LLM and bad output reaching the UI |
 | `src/lib/llm/formatters.test.ts` | Markdown table structure, asset ID inclusion, percentage formatting | The LLM's answer quality depends entirely on the data it receives |
 | `src/lib/llm/schemas.test.ts` | Zod schema: valid/invalid shapes, length constraints, type inference | Confirms Instructor's structured output contract matches expectations |
+| `src/lib/llm/cache.test.ts` | Cache key determinism, TTL expiry, route-level deduplication | Prevents duplicate LLM calls and confirms cost-saving behaviour |
+| `src/app/api/rationale/route.test.ts` | POST 200 / 400 / 500 response paths | Catches regressions in the route's validation and error-handling logic |
 
 **What is intentionally not tested**
 
 - **React components** — the UI layer has no business logic; it is all straightforward conditional rendering and prop threading. Snapshot or interaction tests would be brittle without adding signal.
 - **Integration tests** — calling the real OpenAI API or a live Langfuse instance in tests would be slow, expensive, and flaky. These are covered operationally: every deployment triggers a live rationale call visible in Langfuse.
-- **End-to-end tests** — the app has a single page and no user flows requiring Playwright/Cypress coverage at this stage. E2E tests are the right next step once the scope grows.
-- **`client.ts` / `instructor.ts`** — these are thin wrappers around well-tested third-party SDKs. Testing them would mostly test the libraries themselves, not business logic.
+- **End-to-end tests** — the app has a single page and no user flows requiring Playwright/Cypress coverage at this stage. E2E tests are tracked under [#20](https://github.com/r4kh4t/antarctica-am-draft/issues/20).
+- **`observability.ts` / `instructor.ts`** — thin wrappers around well-tested third-party SDKs; testing them would mostly test the libraries themselves.
 
 ## Data
 
-Authoritative inputs are in `data/actual/`:
+Authoritative inputs live under `data/`:
 
 | File | Role |
 |------|------|
-| `holdings_actual.json` | Lines with ISIN, name, asset class, currency, weight |
-| `prices_actual.json` | Daily tall prices (`isin`, `date`, `price` — string or number; occasional Excel serial dates) |
-| `benchmark_actual.json` | Daily benchmark levels |
-| `constraints_actual.json` | Min/max line size, per–asset-class caps, `max_assets` |
+| `holdings.json` | Lines with ISIN, name, asset class, currency, weight |
+| `prices.json` | Daily tall prices (`isin`, `date`, `price` — string or number; DD/MM/YYYY, ISO datetime, and Excel serial date formats present) |
+| `benchmark.json` | Daily benchmark levels |
+| `constraints.json` | Min/max line size, per–asset-class caps, `max_assets` |
 
-`src/lib/portfolio/actualData.ts` normalises this into the app’s internal shape: unique `assetId` per line (duplicate ISINs get distinct IDs and share a cloned price series), weights renormalised to sum to 100%, asset class → sector for caps, and assumed turnover cap where the policy file is silent.
+`src/lib/portfolio/actualData.ts` normalises this into the app's internal shape: unique `assetId` per line (duplicate ISINs get distinct IDs and share a cloned price series), all date formats unified to `YYYY-MM-DD` via `date-fns`, weights renormalised to sum to 100%, asset class → sector for caps, and assumed turnover cap where the policy file is silent.
 
-Older generated fixtures under `data/*.json` are no longer used by the runtime but remain in the repo for reference.
+## Recommendation method
 
-## Recommendation method (choices to defend in debrief)
+The brief asks to optimise on monthly returns but leaves every other decision open. Rather than a full mean-variance (Markowitz) solve — which requires a stable covariance matrix, is sensitive to estimation error on a thin monthly sample, and is opaque to non-quant stakeholders — this implementation scores each asset using a **Sharpe-like ratio**: annualised arithmetic mean of monthly returns divided by annualised monthly volatility. Proposed weights are formed by **tilting from the current book** toward higher-scoring names (bounded z-score tilt, not a full rebuild from zero), then projected onto soft constraints via iterative rescaling. Monthly returns are **arithmetic** (`P_t / P_{t-1} − 1`) using the last available daily close in each calendar month; no forward-fill is applied across missing dates. Soft constraints — per-asset floor and cap, asset-class ceilings, turnover budget — are enforced by iterative projection and normalisation rather than a constrained quadratic programme, so violations shrink but are not guaranteed to be exactly zero. The result is deterministic, fully traceable in a dozen lines of TypeScript, and every allocation decision can be explained in plain English — the right trade-off for a small stakeholder-facing fund and a take-home where the debrief matters as much as the output.
 
-1. **Objective:** Sharpe-like score — annualised mean monthly return ÷ annualised monthly volatility — then tilt from current weights (not a full covariance optimiser).
-2. **Monthly returns:** Arithmetic month-on-month from month-end prices (last daily observation each calendar month). See `docs/recommendation-methodology.md` for the exact formulas.
-3. **Missing data:** No forward-fill; bad prices dropped at load; sparse months shorten the return sample.
-4. **Soft constraints:** Iterative projection (caps, sector ceilings, turnover), not a guarantor of zero violation without a constrained QP. Cardinality (`max_assets`) vs minimum line size is documented as a modelling conflict rather than silently “fixed.”
+| Decision | Choice | Why |
+|---|---|---|
+| Objective | Sharpe-like score (return ÷ volatility) | Explainable ranking; no covariance matrix needed |
+| Return definition | Arithmetic monthly, month-end close | Matches stakeholder reporting; log returns rank identically for small moves |
+| Missing prices | Drop interval, no forward-fill | Forward-fill would fabricate volatility; sparse months shorten sample visibly |
+| Soft constraints | Iterative projection (not QP) | Transparent, testable, no solver dependency |
+| Cardinality (`max_assets`) | Documented conflict, not enforced | Simultaneous min-line-size + max-names requires mixed-integer optimisation |
+
+See [`docs/recommendation-methodology.md`](docs/recommendation-methodology.md) for the exact formulas and implementation notes.
 
 The UI stays thin; the portfolio layer holds the decisions worth reviewing in code review and debrief.
 
@@ -159,8 +166,19 @@ When `NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN` / `ROLLBAR_SERVER_TOKEN` are blank, Roll
 | [Checkly](https://vercel.com/integrations/checkly) | Synthetic monitoring (Playwright health checks) | Free tier available |
 | [PostHog](https://vercel.com/integrations/posthog) | Session replay + product analytics | Free tier: 1M events/month |
 
-## Next Improvements
+## Next Steps
 
-- Optional mixed-integer or cardinality-aware solver if `max_assets` must be binding alongside minimum line sizes.
-- Add a small assumptions panel with links to raw `data/actual/` files.
-- Add a sensitivity view showing how the recommendation changes under stricter turnover or sector constraints.
+The following are tracked as open GitHub issues on [r4kh4t/antarctica-am-draft](https://github.com/r4kh4t/antarctica-am-draft/issues):
+
+| # | Area | Description |
+|---|---|---|
+| [#15](https://github.com/r4kh4t/antarctica-am-draft/issues/15) | Feature | Sensitivity / what-if panel — show how weights change under stricter turnover or sector constraints |
+| [#14](https://github.com/r4kh4t/antarctica-am-draft/issues/14) | Feature | Streaming AI rationale responses |
+| [#19](https://github.com/r4kh4t/antarctica-am-draft/issues/19) | Feature | Configurable data source (hosted URL or local JSON) |
+| [#20](https://github.com/r4kh4t/antarctica-am-draft/issues/20) | Testing | E2E tests with Playwright for the main dashboard flow |
+| [#22](https://github.com/r4kh4t/antarctica-am-draft/issues/22) | Perf | Bundle size analysis and reduction |
+| [#23](https://github.com/r4kh4t/antarctica-am-draft/issues/23) | Security | Rate-limit `/api/rationale` to prevent LLM cost abuse |
+| Backlog | Robustness | Add Zod validation on raw `data/*.json` inputs at load time |
+| Backlog | Robustness | Extend `validateRationaleRequest` to cover `summary`, `sectorExposures`, `benchmarkName` fields |
+| Backlog | A11y | Add `aria-describedby` to `InfoIcon` tooltip triggers for screen-reader support |
+| Backlog | Optimisation | Mixed-integer solver for cardinality (`max_assets`) combined with minimum line-size constraints |

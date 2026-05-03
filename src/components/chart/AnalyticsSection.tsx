@@ -22,7 +22,7 @@ export function AnalyticsSection({ recommendation }: AnalyticsSectionProps) {
   const [activeTab, setActiveTab] = useState<Tab>("performance");
 
   return (
-    <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-border">
+    <section className="rounded-3xl bg-white shadow-sm ring-1 ring-border">
       {/* Header + tabs */}
       <div className="border-b border-border p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">

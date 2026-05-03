@@ -17,6 +17,10 @@ This repository is a take-home assignment for a senior Next.js role at an asset 
 - `npm run lint` — ESLint
 - `npm run build` — production build (run before shipping)
 
+## Optimisation rationale
+
+The brief asks to optimise on monthly returns but leaves every other decision open. Rather than a full mean-variance (Markowitz) solve — which requires a stable covariance matrix, is sensitive to estimation error on a thin monthly sample, and is opaque to non-quant stakeholders — this implementation scores each asset using a **Sharpe-like ratio**: annualised arithmetic mean of monthly returns divided by annualised monthly volatility. Proposed weights are formed by **tilting from the current book** toward higher-scoring names (bounded z-score tilt, not a full rebuild from zero), then projected onto soft constraints via iterative rescaling. Monthly returns are **arithmetic** (`P_t / P_{t-1} − 1`) using the last available daily close in each calendar month; no forward-fill is applied across missing dates. Soft constraints are enforced by iterative projection and normalisation rather than a constrained quadratic programme, so violations shrink but are not guaranteed to be exactly zero. The result is deterministic, fully traceable in a dozen lines of TypeScript, and every allocation decision can be explained in plain English — the right trade-off for a small stakeholder-facing fund and a take-home where the debrief matters as much as the output.
+
 ## Data
 
-Portfolio inputs are JSON under `data/actual/`. `src/lib/portfolio/actualData.ts` normalises the author file shape (ISINs, dates, weights) into the app’s TypeScript types; `src/lib/portfolio/data.ts` validates and exposes `getPortfolioData()`. Root-level `data/*.json` files are legacy fixtures and are not used by the current load path.
+Portfolio inputs are JSON under `data/` (`holdings.json`, `prices.json`, `benchmark.json`, `constraints.json`). `src/lib/portfolio/actualData.ts` normalises the author file shape (ISINs, mixed date formats, string prices) into the app’s TypeScript types; `src/lib/portfolio/data.ts` validates and exposes `getPortfolioData()`.

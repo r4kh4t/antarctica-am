@@ -1,18 +1,7 @@
 "use client";
 
 import { Tooltip } from "@/components/shared/Tooltip";
-
-type MoveFilter = "all" | "increase" | "reduce" | "hold";
-
-type SortKey =
-  | "ticker"
-  | "sector"
-  | "currentWeight"
-  | "recommendedWeight"
-  | "weightDelta"
-  | "riskAdjustedScore";
-
-type SortDirection = "asc" | "desc";
+import type { MoveFilter, SortDirection, SortKey } from "./types";
 
 type TableControlsProps = {
   query: string;

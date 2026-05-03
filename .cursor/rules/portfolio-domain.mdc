@@ -6,9 +6,16 @@ alwaysApply: false
 
 # Portfolio Domain
 
+## Optimisation rationale (one paragraph — defend this in debrief)
+
+The brief asks to optimise on monthly returns but leaves every other decision open. Rather than a full mean-variance (Markowitz) solve — which requires a stable covariance matrix, is sensitive to estimation error on a thin monthly sample, and is opaque to non-quant stakeholders — this implementation scores each asset using a **Sharpe-like ratio**: annualised arithmetic mean of monthly returns divided by annualised monthly volatility. Proposed weights are formed by **tilting from the current book** toward higher-scoring names (bounded z-score tilt, not a full rebuild from zero), then projected onto soft constraints via iterative rescaling. Monthly returns are **arithmetic** (`P_t / P_{t-1} − 1`) using the last available daily close in each calendar month; no forward-fill is applied across missing dates. Soft constraints are enforced by iterative projection and normalisation rather than a constrained quadratic programme, so violations shrink but are not guaranteed to be exactly zero. The result is deterministic, fully traceable in a dozen lines of TypeScript, and every allocation decision can be explained in plain English.
+
+## Rules
+
 - Optimise on monthly returns by deriving month-end values from daily series.
 - Keep recommendation logic deterministic; do not use randomness without a fixed generator and clear reason.
 - Treat business constraints as soft constraints, but never fail them silently.
 - Return rationale that explains why each asset was increased, reduced, or held.
 - Keep all weights as decimals internally, where `1` equals `100%`.
 - Tests should cover normalization, sparse data, turnover, and constraint behavior.
+- Any change to the scoring method, return definition, or constraint enforcement **must** update the rationale paragraph above and the matching text in `AGENTS.md` and `README.md`.
