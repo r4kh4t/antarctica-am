@@ -16,7 +16,7 @@ Systematic debugging guide for the Antarctica Portfolio Recommendation app.
 **Checklist**:
 1. Check browser DevTools → Network → `POST /api/rationale`. Is the status 200?
 2. If 500, check the response body for the error message.
-3. If the LLM returned a response, check `result.rationale` keys vs the `assetId` values in `data/holdings.json`. They must match exactly.
+3. If the LLM returned a response, check `result.rationale` keys vs the `assetId` values from `getPortfolioData().holdings` (sourced from `data/actual/holdings_actual.json` after normalisation). They must match exactly.
 4. Confirm `formatForLLM()` includes the `Asset ID` column — check `src/lib/llm/formatters.ts`.
 5. Confirm the system prompt instructs the LLM to use the exact `Asset ID` as JSON keys — check `src/lib/llm/prompts/rationale.ts`.
 6. Check Langfuse (if configured) to inspect the actual LLM response.

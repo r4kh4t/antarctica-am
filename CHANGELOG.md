@@ -9,6 +9,24 @@ Versioning rule: bump `package.json` **and** add a changelog entry in the same c
 
 ---
 
+## [1.6.1] — 2026-05-03
+
+### Changed
+
+- `AGENTS.md`: restore concise, production-style guidance for AI-assisted work; update data path note for `data/actual/`.
+
+## [1.6.0] — 2026-05-03
+
+### Added
+
+- `src/lib/portfolio/actualData.ts`: loads `data/actual/*`, maps the author JSON schema to internal portfolio types, coerces Excel serial dates and string prices, renormalises weights, duplicates shared-ISIN price rows per holdings line.
+
+### Changed
+
+- `src/lib/portfolio/data.ts`: portfolio inputs come from normalised actual data instead of root `data/*.json` fixtures.
+- `src/lib/portfolio/recommendation.ts`: methodology strings document arithmetic monthly returns, sparse history, and iterative soft-constraint handling.
+- `README.md`, `AGENTS.md`, `docs/recommendation-methodology.md`, `docs/architecture.md`, `.cursor/skills/portfolio-recommendation/SKILL.md`, `.cursor/skills/debug/SKILL.md`: debrief-first framing and explicit modelling assumptions.
+
 ## [1.5.0](https://github.com/r4kh4t/antarctica-am-draft/compare/antarctica-portfolio-recommendation-v1.4.0...antarctica-portfolio-recommendation-v1.5.0) (2026-04-29)
 
 

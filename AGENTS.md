@@ -4,19 +4,19 @@ This repository is a take-home assignment for a senior Next.js role at an asset 
 
 ## Priorities
 
-- Keep changes simple, production-minded, and easy to discuss in a debrief.
-- Prefer clear Next.js App Router conventions over custom architecture.
-- Keep portfolio calculations deterministic and covered by focused tests.
-- Explain financial assumptions in plain English when the brief leaves room for judgment.
-- Treat AI output as draft work that must be reviewed, tested, and corrected before delivery.
+- Ship simple, reviewable changes that match the brief; avoid speculative architecture and unnecessary abstractions.
+- Follow Next.js App Router conventions: keep data loading and portfolio logic off the client where it belongs.
+- Keep portfolio outputs **deterministic**; cover calculation code with focused unit tests.
+- When the brief leaves financial details open, document assumptions in `README.md` or `docs/` in plain language.
+- Treat LLM output as **draft** content: validate, test, and correct before treating it as final.
 
 ## Commands
 
-- `npm run dev` starts the app locally.
-- `npm test` runs portfolio calculation tests.
-- `npm run lint` checks code quality.
-- `npm run build` verifies the production build.
+- `npm run dev` — local dev server
+- `npm test` — portfolio and unit tests
+- `npm run lint` — ESLint
+- `npm run build` — production build (run before shipping)
 
-## Data Assumption
+## Data
 
-The local README references public JSON URLs, but the provided copy does not include them. The app therefore uses deterministic generated fixtures in `data/` and documents that assumption for reviewers.
+Portfolio inputs are JSON under `data/actual/`. `src/lib/portfolio/actualData.ts` normalises the author file shape (ISINs, dates, weights) into the app’s TypeScript types; `src/lib/portfolio/data.ts` validates and exposes `getPortfolioData()`. Root-level `data/*.json` files are legacy fixtures and are not used by the current load path.

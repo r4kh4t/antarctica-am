@@ -196,10 +196,11 @@ export function buildPortfolioRecommendation(
       benchmarkAverageMonthlyReturn: mean(benchmarkMonthlyReturns.map((row) => row.return)),
     },
     methodology: [
-      "Daily prices are converted to month-end prices because the brief optimises on monthly returns.",
-      "Assets are scored using annualised return divided by annualised volatility, then tilted from current weights.",
-      "Soft constraints are applied after scoring so the output remains diversified, explainable, and turnover-aware.",
-      "The calculation is deterministic and intentionally avoids an opaque optimiser for this small stakeholder-facing task.",
+      "Monthly return is month-on-month from month-end levels: r = P(end)/P(prev) - 1 (arithmetic; log returns would rank similarly for small moves).",
+      "Each month uses the last available daily price in that calendar month; rows with non-numeric or non-positive prices are dropped at load. Sparse months reduce the return sample—no forward-fill across missing dates.",
+      "Assets are scored with annualised return ÷ annualised volatility (a Sharpe-like ranking), then tilted from current weights—not a full covariance Markowitz solve.",
+      "Soft constraints (min/max line, asset-class caps, turnover) are enforced by iterative projection and rescaling, so violations shrink but are not guaranteed zero without a constrained QP.",
+      "Deterministic pipeline suitable for debrief: inspect data → metrics → tilt → constraints.",
     ],
   };
 }

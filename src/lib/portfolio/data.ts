@@ -1,8 +1,5 @@
-import benchmark from "../../../data/benchmark.json";
-import constraints from "../../../data/constraints.json";
-import holdings from "../../../data/holdings.json";
-import prices from "../../../data/prices.json";
-import type { Benchmark, Constraints, Holdings, Prices } from "./types";
+import { buildPortfolioDataFromActual } from "./actualData";
+import type { Holdings } from "./types";
 
 function assertWeightTotal(assets: Holdings["assets"]) {
   const total = assets.reduce((sum, asset) => sum + asset.currentWeight, 0);
@@ -25,18 +22,15 @@ function assertUniqueAssets(assets: Holdings["assets"]) {
 }
 
 export function getPortfolioData() {
-  const typedHoldings = holdings as Holdings;
-  const typedPrices = prices as Prices;
-  const typedBenchmark = benchmark as Benchmark;
-  const typedConstraints = constraints as Constraints;
+  const { holdings, prices, benchmark, constraints } = buildPortfolioDataFromActual();
 
-  assertUniqueAssets(typedHoldings.assets);
-  assertWeightTotal(typedHoldings.assets);
+  assertUniqueAssets(holdings.assets);
+  assertWeightTotal(holdings.assets);
 
   return {
-    holdings: typedHoldings,
-    prices: typedPrices,
-    benchmark: typedBenchmark,
-    constraints: typedConstraints,
+    holdings,
+    prices,
+    benchmark,
+    constraints,
   };
 }

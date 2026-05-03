@@ -1,0 +1,10 @@
+{
+  "min_weight": 0.02,
+  "max_weight": 0.25,
+  "per_asset_class_caps": {
+    "Equity": 0.3,
+    "Fixed Income": 0.3,
+    "Alternatives": 0.3
+  },
+  "max_assets": 5
+}

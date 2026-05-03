@@ -7,8 +7,9 @@ A focused Next.js 16 dashboard that reads portfolio data, calculates risk-adjust
 ## Data Flow
 
 ```
-data/*.json
-  └─ src/lib/portfolio/data.ts          load + validate fixture data
+data/actual/*.json
+  └─ src/lib/portfolio/actualData.ts    normalise author schema → internal types
+       └─ src/lib/portfolio/data.ts     validate weights + uniqueness
        └─ src/lib/portfolio/monthlyReturns.ts   daily prices → month-end returns
             └─ src/lib/portfolio/recommendation.ts  score assets, apply constraints
                  └─ src/app/page.tsx    server-render → serializable props

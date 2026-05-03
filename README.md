@@ -6,6 +6,8 @@
 
 A small production-minded Next.js application that reads portfolio data, calculates monthly return metrics, recommends revised asset weights, and presents the result in a dashboard suitable for a stakeholder debrief.
 
+**Assessment framing:** the brief stresses that AI can support delivery but does not replace engineering judgment. The debrief is where trade-offs are evaluated; this README and `docs/recommendation-methodology.md` record the assumptions you are expected to defend (objective, return definition, missing data, soft constraints).
+
 ## Live Deployment
 
 Vercel URL: [https://antarctica-am-draft.vercel.app](https://antarctica-am-draft.vercel.app)
@@ -55,27 +57,27 @@ The project covers the code that is both easy to unit-test and most important to
 
 ## Data
 
-The assignment brief references four public JSON URLs, but the local brief provided in this repository did not include the actual URLs. To keep the app self-contained and reviewable, this submission uses deterministic generated fixtures:
+Authoritative inputs are in `data/actual/`:
 
-- `data/holdings.json`: current portfolio weights and asset metadata
-- `data/prices.json`: daily asset prices in tall format
-- `data/benchmark.json`: daily benchmark levels
-- `data/constraints.json`: soft business constraints
+| File | Role |
+|------|------|
+| `holdings_actual.json` | Lines with ISIN, name, asset class, currency, weight |
+| `prices_actual.json` | Daily tall prices (`isin`, `date`, `price` — string or number; occasional Excel serial dates) |
+| `benchmark_actual.json` | Daily benchmark levels |
+| `constraints_actual.json` | Min/max line size, per–asset-class caps, `max_assets` |
 
-The generated data is fictional and designed to exercise the recommendation logic, constraint handling, charting, and debrief discussion.
+`src/lib/portfolio/actualData.ts` normalises this into the app’s internal shape: unique `assetId` per line (duplicate ISINs get distinct IDs and share a cloned price series), weights renormalised to sum to 100%, asset class → sector for caps, and assumed turnover cap where the policy file is silent.
 
-## Recommendation Method
+Older generated fixtures under `data/*.json` are no longer used by the runtime but remain in the repo for reference.
 
-The brief says to optimise on monthly returns but intentionally leaves the objective open. I chose a pragmatic, explainable method:
+## Recommendation method (choices to defend in debrief)
 
-1. Convert daily prices and benchmark levels into month-end series.
-2. Calculate monthly returns per asset.
-3. Score each asset using annualised return divided by annualised volatility.
-4. Tilt away from current weights toward stronger risk-adjusted assets.
-5. Apply soft constraints for max/min asset weight, sector ranges, turnover, and total weight.
-6. Return a rationale for each asset so a colleague can understand why it was increased, reduced, or held.
+1. **Objective:** Sharpe-like score — annualised mean monthly return ÷ annualised monthly volatility — then tilt from current weights (not a full covariance optimiser).
+2. **Monthly returns:** Arithmetic month-on-month from month-end prices (last daily observation each calendar month). See `docs/recommendation-methodology.md` for the exact formulas.
+3. **Missing data:** No forward-fill; bad prices dropped at load; sparse months shorten the return sample.
+4. **Soft constraints:** Iterative projection (caps, sector ceilings, turnover), not a guarantor of zero violation without a constrained QP. Cardinality (`max_assets`) vs minimum line size is documented as a modelling conflict rather than silently “fixed.”
 
-This is deliberately not a black-box optimiser. For a small internal fund and a take-home exercise, the recommendation should be easy to inspect, test, and explain.
+The UI stays thin; the portfolio layer holds the decisions worth reviewing in code review and debrief.
 
 ## Application Structure
 
@@ -83,7 +85,7 @@ This is deliberately not a black-box optimiser. For a small internal fund and a 
 - `src/components/`: grouped into `dashboard/`, `chart/`, `table/`, and `shared/` subdirectories
 - `src/lib/llm/`: OpenAI client, token estimation, guardrails, formatters, versioned prompts
 - `src/app/api/rationale/`: POST route that generates AI rationale via GPT
-- `src/lib/portfolio/`: data loading, monthly return calculation, constraints, recommendation logic, formatting, and tests
+- `src/lib/portfolio/`: actual-data normalisation, monthly return calculation, constraints, recommendation logic, formatting, and tests
 - `docs/`: architecture, methodology, development workflow, and AI workflow notes
 - `.cursor/`: project rules, hooks, and skills used to guide AI-assisted development
 - `AGENTS.md`: repository-level AI guidance
@@ -159,6 +161,6 @@ When `NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN` / `ROLLBAR_SERVER_TOKEN` are blank, Roll
 
 ## Next Improvements
 
-- Replace generated fixtures with the original hosted JSON files if the URLs become available.
-- Add a small assumptions panel with links to raw data files.
+- Optional mixed-integer or cardinality-aware solver if `max_assets` must be binding alongside minimum line sizes.
+- Add a small assumptions panel with links to raw `data/actual/` files.
 - Add a sensitivity view showing how the recommendation changes under stricter turnover or sector constraints.
