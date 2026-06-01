@@ -53,6 +53,6 @@
     "lint-staged": "^15.5.2",
     "tailwindcss": "^4.2.4",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.0"
   }
 }
